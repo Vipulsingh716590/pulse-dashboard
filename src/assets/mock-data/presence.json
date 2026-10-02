@@ -1,0 +1,8 @@
+[
+  {"personId":"lead","state":"offline","note":"On planned leave today"},
+  {"personId":"a","state":"working"},
+  {"personId":"b","state":"blocked","note":"Waiting for final Rewards Hub designs"},
+  {"personId":"c","state":"working"},
+  {"personId":"d","state":"working"},
+  {"personId":"e","state":"working"}
+]

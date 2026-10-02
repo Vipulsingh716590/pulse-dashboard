@@ -1,0 +1,5 @@
+[
+  {"id":"r1","personId":"a","weekStart":"2026-09-21","wentWell":"Shipped the design-system tokens with zero regressions.","inMyControl":"How I planned my focus blocks.","improve":"Ask for the API mock on day one.","createdAt":"2026-09-25T17:30:00+05:30"},
+  {"id":"r2","personId":"d","weekStart":"2026-09-21","wentWell":"Autopay retries are finally stable.","inMyControl":"Taking on the extra payments ticket.","improve":"Say no to one non-urgent request.","createdAt":"2026-09-25T20:10:00+05:30"},
+  {"id":"r3","personId":"e","weekStart":"2026-09-14","wentWell":"Recovered well after the fever; the team covered for me.","inMyControl":"Resting instead of pushing through.","improve":"Write tests for my accessibility fixes.","createdAt":"2026-09-18T18:00:00+05:30"}
+]

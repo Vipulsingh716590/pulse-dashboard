@@ -1,0 +1,9 @@
+[
+  {"id":"mgr","name":"Ananya Rao","shortName":"Ananya","role":"manager","position":"Engineering Manager","avatarColor":"#2f6fed","initials":"AR"},
+  {"id":"lead","name":"Aarav Mehta","shortName":"Aarav","role":"lead","position":"Team Lead, Web","avatarColor":"#6d5dd3","skills":{"frontend":4,"backend":4,"ui":3,"testing":3,"api":5,"communication":5},"initials":"AM","capacityHours":8,"reportsTo":"mgr"},
+  {"id":"a","name":"Developer A","shortName":"A","role":"developer","position":"Senior Frontend Developer","avatarColor":"#d36d9e","skills":{"frontend":5,"backend":2,"ui":5,"testing":4,"api":3,"communication":4},"initials":"DA","capacityHours":8,"reportsTo":"lead"},
+  {"id":"b","name":"Developer B","shortName":"B","role":"developer","position":"Frontend Developer","avatarColor":"#3d9a8b","skills":{"frontend":4,"backend":3,"ui":4,"testing":2,"api":3,"communication":3},"initials":"DB","capacityHours":8,"reportsTo":"lead"},
+  {"id":"c","name":"Developer C","shortName":"C","role":"developer","position":"Backend Developer","avatarColor":"#d3a25d","skills":{"frontend":3,"backend":5,"ui":2,"testing":4,"api":5,"communication":4},"initials":"DC","capacityHours":8,"reportsTo":"lead"},
+  {"id":"d","name":"Developer D","shortName":"D","role":"developer","position":"Full-Stack Developer","avatarColor":"#5d8fd3","skills":{"frontend":4,"backend":4,"ui":3,"testing":3,"api":4,"communication":3},"initials":"DD","capacityHours":8,"reportsTo":"lead"},
+  {"id":"e","name":"Developer E","shortName":"E","role":"developer","position":"Junior Frontend Developer","avatarColor":"#5db37a","skills":{"frontend":4,"backend":2,"ui":3,"testing":2,"api":2,"communication":4},"initials":"DE","capacityHours":8,"reportsTo":"lead"}
+]
