@@ -9,8 +9,8 @@
   @let k = kpis();
   @if (k.enough) {
     <section class="grid12 kpis">
+      <app-kpi-card class="c3" label="Feeling well" [value]="k.well" unit="%" [delta]="k.dWell" deltaUnit=" pts" [deltaLabel]="k.compare" [accent]="true" />
       <app-kpi-card class="c3" label="Energy" [value]="k.energy" unit="/5" [delta]="k.dEnergy" deltaUnit="" [deltaLabel]="k.compare" />
-      <app-kpi-card class="c3" label="Mood" [value]="k.mood" unit="/5" [delta]="k.dMood" deltaUnit="" [deltaLabel]="k.compare" />
       <app-kpi-card class="c3" label="Focus" [value]="k.focus" unit="/5" [delta]="k.dFocus" deltaUnit="" [deltaLabel]="k.compare" />
       <app-kpi-card class="c3" label="Stress" [value]="k.stress" unit="/5" [delta]="k.dStress" deltaUnit="" [deltaLabel]="k.compare" [higherIsBetter]="false" />
     </section>

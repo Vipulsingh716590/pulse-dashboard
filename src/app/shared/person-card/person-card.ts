@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TeamStore } from '../../core/services/team-store.service';
-import { isDone, isUnwell, moodEmoji } from '../../core/utils/insights';
+import { isDone, isUnwell } from '../../core/utils/insights';
 import { StatusDot } from '../status-dot/status-dot';
 
 /**
@@ -26,9 +26,9 @@ export class PersonCard {
   protected readonly health = computed(() => {
     const c = this.store.todayCheckIn(this.personId());
     const note = this.store.presenceNote(this.personId());
-    if (!c) return { line: note ?? 'Not checked in yet', mood: null };
-    if (isUnwell(c)) return { line: 'Unwell – needs rest', mood: null };
-    return { line: `Feeling well · energy ${c.energy}/5 · slept ${c.sleepHours}h`, mood: moodEmoji(c.mood) };
+    if (!c) return note ?? 'Not checked in yet';
+    if (isUnwell(c)) return 'Unwell – needs rest';
+    return `Feeling well · energy ${c.energy}/5 · stress ${c.stress}/5`;
   });
 
   protected readonly today = computed(() => {

@@ -47,13 +47,12 @@
         @if (checkIn() && !editing()) {
           @let c = checkIn()!;
           <div class="summary">
-            <span class="emoji" aria-hidden="true">{{ unwell() ? '🤒' : moodEmoji(c.mood) }}</span>
+            <span class="emoji" aria-hidden="true">{{ unwell() ? '🤒' : '🙂' }}</span>
             <dl>
               <div><dt>Feeling</dt><dd>{{ unwell() ? 'Unwell' : 'Well' }}</dd></div>
               @if (c.temperatureF) {
                 <div><dt>Temperature</dt><dd>{{ c.temperatureF }}°F ({{ fToC(c.temperatureF) }}°C)</dd></div>
               }
-              <div><dt>Sleep</dt><dd>{{ c.sleepHours }}h</dd></div>
               <div><dt>Energy</dt><dd>{{ c.energy }}/5</dd></div>
               <div><dt>Focus</dt><dd>{{ c.focus }}/5</dd></div>
               <div><dt>Stress</dt><dd>{{ c.stress }}/5</dd></div>
@@ -66,6 +65,14 @@
         } @else {
           <app-check-in-form [personId]="p.id" (saved)="onSaved($event)" />
         }
+        <button type="button" class="health-btn" (click)="healthOpen.set(true)">
+          <span class="material-symbols-outlined" aria-hidden="true">watch</span>
+          <span class="text">
+            <strong>My Health Data</strong>
+            <span>Heart rate, blood pressure and more from your watch · 🔒 only you</span>
+          </span>
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        </button>
       </div>
 
       <div class="card c7">
@@ -127,10 +134,34 @@
       </div>
 
       <div class="card c6">
+        <div class="card-head"><h2>My last 4 weeks</h2><span class="muted small">Weekly averages</span></div>
+        <app-simple-trend [checkIns]="myCheckIns()" />
+      </div>
+
+      <div class="card c6">
+        <div class="card-head">
+          <h2>My next-week outlook <app-info-tip [text]="tips.outlook" /></h2>
+          @if (outlook(); as o) {
+            <span class="risk" [class]="o.level">{{ o.level }} risk</span>
+          }
+        </div>
+        @if (outlook(); as o) {
+          <ul class="reasons">
+            @for (r of o.reasons; track $index) {
+              <li>{{ r }}</li>
+            }
+          </ul>
+          @if (o.level !== 'Low') {
+            <p class="supportive">A lighter plan is a strength, not a weakness. Talk to your manager about what can move.</p>
+          }
+        }
+        <p class="disclaimer">Wellbeing tool, not medical advice.</p>
+      </div>
+      <div class="card c12">
         <div class="card-head">
           <h2>Weekly reflection <app-info-tip [text]="tips.stoic" /></h2>
         </div>
-        <form class="reflect" (submit)="$event.preventDefault(); saveReflection()">
+        <form class="reflect wide" (submit)="$event.preventDefault(); saveReflection()">
           <label>
             <span>What went well this week?</span>
             <textarea rows="2" [value]="wentWell()" (input)="wentWell.set($any($event.target).value)"></textarea>
@@ -157,25 +188,10 @@
         }
       </div>
 
-      <div class="card c6">
-        <div class="card-head">
-          <h2>My next-week outlook <app-info-tip [text]="tips.outlook" /></h2>
-          @if (outlook(); as o) {
-            <span class="risk" [class]="o.level">{{ o.level }} risk</span>
-          }
-        </div>
-        @if (outlook(); as o) {
-          <ul class="reasons">
-            @for (r of o.reasons; track $index) {
-              <li>{{ r }}</li>
-            }
-          </ul>
-          @if (o.level !== 'Low') {
-            <p class="supportive">A lighter plan is a strength, not a weakness. Talk to your manager about what can move.</p>
-          }
-        }
-        <p class="disclaimer">Wellbeing tool, not medical advice.</p>
-      </div>
     </section>
   </div>
+
+  @if (healthOpen()) {
+    <app-health-data-panel [personId]="p.id" (closed)="healthOpen.set(false)" />
+  }
 }

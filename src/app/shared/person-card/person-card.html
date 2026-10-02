@@ -12,12 +12,7 @@
     <!-- 1. Health and availability come first -->
     <div class="health">
       <app-status-dot [status]="status()" [label]="true" />
-      <span class="line">
-        @if (health().mood) {
-          <span class="mood" aria-hidden="true">{{ health().mood }}</span>
-        }
-        {{ health().line }}
-      </span>
+      <span class="line">{{ health() }}</span>
     </div>
 
     <!-- 2. Today's work -->

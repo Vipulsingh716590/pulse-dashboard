@@ -5,17 +5,19 @@ import { NotificationService } from '../../core/services/notification.service';
 import { TeamStore } from '../../core/services/team-store.service';
 import { ViewingAsService } from '../../core/services/viewing-as.service';
 import { formatDay, fToC, formatLongDate, MOCK_TODAY, mockNow, weekStart } from '../../core/utils/date';
-import { FRAMEWORK_TIPS, IMPROVEMENT_ACTIONS, isUnwell, moodEmoji, STATUS_LABELS, strengthsAndGaps, TYPE_LABELS } from '../../core/utils/insights';
+import { FRAMEWORK_TIPS, IMPROVEMENT_ACTIONS, isUnwell, STATUS_LABELS, strengthsAndGaps, TYPE_LABELS } from '../../core/utils/insights';
 import { SevenDayTable } from '../../shared/charts/seven-day-table';
+import { SimpleTrend } from '../../shared/charts/simple-trend';
 import { SkillRadar } from '../../shared/charts/skill-radar';
 import { InfoTip } from '../../shared/info-tip/info-tip';
 import { StatusDot } from '../../shared/status-dot/status-dot';
 import { CheckInForm } from './check-in-form';
+import { HealthDataPanel } from './health-data/health-data-panel';
 
 /** A developer's own space: check-in, tasks, history, growth, reflection and outlook. */
 @Component({
   selector: 'app-my-space',
-  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, SkillRadar, InfoTip],
+  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, SkillRadar, InfoTip, SimpleTrend, HealthDataPanel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './my-space.html',
   styleUrl: './my-space.scss',
@@ -29,7 +31,6 @@ export class MySpace {
   protected readonly tips = FRAMEWORK_TIPS;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly typeLabels = TYPE_LABELS;
-  protected readonly moodEmoji = moodEmoji;
   protected readonly fToC = fToC;
   protected readonly formatDay = formatDay;
 
@@ -38,6 +39,9 @@ export class MySpace {
   protected readonly checkIn = computed(() => this.store.todayCheckIn(this.viewingAs.viewerId()));
   protected readonly unwell = computed(() => isUnwell(this.checkIn()));
   protected readonly editing = signal(false);
+  /** The private watch panel. */
+  protected readonly healthOpen = signal(false);
+  protected readonly myCheckIns = computed(() => this.store.checkInsFor(this.viewingAs.viewerId()));
   protected readonly lastResult = signal<{ unwell: boolean; suggestions: number } | null>(null);
   private readonly form = viewChild(CheckInForm);
 
@@ -72,6 +76,7 @@ export class MySpace {
       this.viewingAs.viewerId();
       untracked(() => {
         this.editing.set(false);
+        this.healthOpen.set(false);
         this.lastResult.set(null);
         const r = this.reflection();
         const current = r?.weekStart === this.thisWeek;

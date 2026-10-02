@@ -1,0 +1,81 @@
+<div class="backdrop" (click)="closed.emit()" aria-hidden="true"></div>
+<aside class="panel" role="dialog" aria-modal="true" aria-label="My health data">
+  <header class="head">
+    <span class="material-symbols-outlined icon" aria-hidden="true">watch</span>
+    <div class="who">
+      <h2>My Health Data</h2>
+      <span class="private"><span class="material-symbols-outlined" aria-hidden="true">lock</span> Only you can see this</span>
+    </div>
+    <button mat-icon-button (click)="closed.emit()" aria-label="Close">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+  </header>
+
+  <div class="body">
+    <section class="device">
+      <div>
+        <strong>Connected device</strong>
+        <span class="muted small">{{ connected() ? deviceName + ' · last synced 11:40' : 'Not connected' }}</span>
+      </div>
+      <mat-slide-toggle [checked]="connected()" (change)="connected.set($event.checked)">{{ connected() ? 'On' : 'Off' }}</mat-slide-toggle>
+    </section>
+
+    @if (!connected()) {
+      <p class="muted">Disconnected. No watch data is read while this is off. Turn it on to see the demo data again.</p>
+    } @else {
+      @if (today(); as t) {
+        @for (n of notes(); track $index) {
+          <p class="note">{{ n }}</p>
+        }
+
+        <section class="tiles" aria-label="Today's readings">
+          <div class="tile hr"><span>Heart rate</span><strong>{{ t.heartRate }}<small> bpm</small></strong><em>resting {{ t.restingHeartRate }} bpm</em></div>
+          <div class="tile bp">
+            <span>Blood pressure</span>
+            @if (t.systolic && t.diastolic) {
+              <strong>{{ t.systolic }}/{{ t.diastolic }}<small> mmHg</small></strong>
+            } @else {
+              <strong>—</strong>
+            }
+            <em>if your device supports it</em>
+          </div>
+          <div class="tile"><span>SpO2</span><strong>{{ t.spo2 }}<small>%</small></strong><em>blood oxygen</em></div>
+          <div class="tile" [class.warm]="t.skinTempDeltaC >= 0.6">
+            <span>Skin temperature</span><strong>{{ t.skinTempDeltaC > 0 ? '+' : '' }}{{ t.skinTempDeltaC }}<small> °C</small></strong><em>vs your normal</em>
+          </div>
+          <div class="tile"><span>Steps</span><strong>{{ t.steps.toLocaleString('en-IN') }}</strong><em>{{ t.activeMinutes }} active min</em></div>
+          <div class="tile"><span>HRV</span><strong>{{ t.hrvMs }}<small> ms</small></strong><em>higher = more recovered</em></div>
+          <div class="tile"><span>Watch stress score</span><strong>{{ t.stressScore }}<small>/100</small></strong><em>from your device</em></div>
+        </section>
+
+        <section class="chart-card">
+          <h3>Heart rate, last 7 days</h3>
+          <app-chart [options]="heartChart()" [height]="200" />
+        </section>
+        <section class="chart-card">
+          <h3>Blood pressure, last 7 days</h3>
+          <app-chart [options]="bpChart()" [height]="200" />
+        </section>
+      } @else {
+        <p class="muted">Loading your readings…</p>
+      }
+    }
+
+    <section class="connect">
+      <h3>Connect a device</h3>
+      <div class="devices">
+        @for (d of devices; track d) {
+          <button mat-stroked-button (click)="connect(d)">{{ d }}</button>
+        }
+      </div>
+      @if (comingSoon()) {
+        <p class="muted small">{{ comingSoon() }}</p>
+      }
+      <p class="muted small">
+        Your watch data stays with you. It is not shared with your manager, not used in team averages and not sent in notifications.
+      </p>
+    </section>
+
+    <p class="disclaimer">Wellbeing tool, not medical advice.</p>
+  </div>
+</aside>

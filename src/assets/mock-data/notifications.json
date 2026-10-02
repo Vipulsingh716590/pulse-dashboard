@@ -1,6 +1,6 @@
 [
   {"id":"n1","to":"mgr","kind":"blocked","personId":"b","title":"Developer B is blocked","body":"Waiting for final Rewards Hub designs.","createdAt":"2026-10-02T10:22:00+05:30","read":false,"link":"/team"},
-  {"id":"n2","to":"mgr","kind":"attention","personId":"d","title":"Developer D may need a lighter load","body":"Slept under 6h for several days and today is planned at 130% of capacity.","createdAt":"2026-10-02T09:40:00+05:30","read":false,"link":"/team"},
+  {"id":"n2","to":"mgr","kind":"attention","personId":"d","title":"Developer D may need a lighter load","body":"Stress has been high and energy low for several days, and today is planned at 130% of capacity.","createdAt":"2026-10-02T09:40:00+05:30","read":false,"link":"/team"},
   {"id":"n3","to":"mgr","kind":"info","title":"Two tasks are waiting for your review","body":"Developer A and Developer E reported work as done.","createdAt":"2026-10-02T10:52:00+05:30","read":true,"link":"/tasks"},
   {"id":"n4","to":"e","kind":"message","title":"Welcome back to the Design System work","body":"Great job on the button states, E. – Ananya","createdAt":"2026-10-02T10:55:00+05:30","read":false}
 ]

@@ -145,7 +145,7 @@ const days = workingDaysBack(30, TODAY);
 const FEVER = { personId: 'e', date: '2026-09-15' }; // Developer E has a fever
 const LEAVE = [{ personId: 'e', date: '2026-09-16' }, { personId: 'lead', date: TODAY }];
 const isLeave = (id, d) => LEAVE.some((l) => l.personId === id && l.date === d);
-const dCrunch = (id, d) => id === 'd' && d >= '2026-09-28'; // overload + short sleep → high risk
+const dCrunch = (id, d) => id === 'd' && d >= '2026-09-28'; // overload + high stress + low energy → high risk
 const CHECKED_IN_TODAY = ['a', 'b', 'd']; // C and E can check in from My Space
 
 const notes = {
@@ -207,7 +207,8 @@ for (const p of members) {
     focusLogs.push({ personId: p.id, date, hours });
   }
 }
-write('check-ins.json', checkIns);
+// Mood and sleep are only used inside this script (note tone, WHO-5); the app does not collect them.
+write('check-ins.json', checkIns.map(({ mood, sleepHours, ...c }) => c));
 write('focus-logs.json', focusLogs);
 
 // ---------- tasks ----------
@@ -264,7 +265,7 @@ today('b', 'Accessibility pass on KYC Flow forms', 'KYC Flow', 'frontend', 2, 'p
 // C: 3.2h → 40%, strong in backend → the natural cover
 today('c', 'Webhook retries for UPI Autopay', 'UPI Autopay', 'backend', 2, 'completed', 100, { completedAt: `${TODAY}T11:05:00+05:30` });
 today('c', 'Optimise Bill Payments query latency', 'Bill Payments', 'backend', 1.2, 'in-progress', 50, { startedAt: `${TODAY}T11:10:00+05:30` });
-// D: 10.4h → 130%, short on sleep → needs attention
+// D: 10.4h → 130%, stressed and low on energy → needs attention
 today('d', 'End-to-end UPI Autopay checkout step', 'UPI Autopay', 'both', 3.5, 'in-progress', 45, { startedAt: `${TODAY}T09:30:00+05:30` });
 today('d', 'Rate limiting on Wallet Revamp endpoints', 'Wallet Revamp', 'backend', 2, 'pending', 50, { carriedFrom: addDays(TODAY, -1) });
 today('d', 'Wire Merchant Dashboard form to the new API', 'Merchant Dashboard', 'both', 3, 'planned', 0);
@@ -314,9 +315,43 @@ write('notifications.json', [
   { id: 'n1', to: 'mgr', kind: 'blocked', personId: 'b', title: 'Developer B is blocked', body: 'Waiting for final Rewards Hub designs.',
     createdAt: `${TODAY}T10:22:00+05:30`, read: false, link: '/team' },
   { id: 'n2', to: 'mgr', kind: 'attention', personId: 'd', title: 'Developer D may need a lighter load',
-    body: 'Slept under 6h for several days and today is planned at 130% of capacity.', createdAt: `${TODAY}T09:40:00+05:30`, read: false, link: '/team' },
+    body: 'Stress has been high and energy low for several days, and today is planned at 130% of capacity.', createdAt: `${TODAY}T09:40:00+05:30`, read: false, link: '/team' },
   { id: 'n3', to: 'mgr', kind: 'info', title: 'Two tasks are waiting for your review', body: 'Developer A and Developer E reported work as done.',
     createdAt: `${TODAY}T10:52:00+05:30`, read: true, link: '/tasks' },
   { id: 'n4', to: 'e', kind: 'message', title: 'Welcome back to the Design System work', body: 'Great job on the button states, E. – Ananya',
     createdAt: `${TODAY}T10:55:00+05:30`, read: false },
 ]);
+
+// ---------- wearable (mock smartwatch data, private to each developer) ----------
+// Real data would come from Fitbit / Garmin / Oura / Apple Health / Health Connect.
+const wearable = [];
+const wearDays = Array.from({ length: 14 }, (_, i) => addDays(TODAY, i - 13));
+const wearBase = {
+  a: { rhr: 62, sys: 116, dia: 75, steps: 7800 },
+  b: { rhr: 66, sys: 118, dia: 77, steps: 6200 },
+  c: { rhr: 58, sys: 114, dia: 73, steps: 9400 },
+  d: { rhr: 70, sys: 126, dia: 82, steps: 4800 },
+  e: { rhr: 64, sys: 117, dia: 76, steps: 7100 },
+};
+for (const [id, w] of Object.entries(wearBase)) {
+  for (const date of wearDays) {
+    const crunch = dCrunch(id, date);
+    const feverish = id === 'e' && date === TODAY; // the watch notices before E checks in
+    const rhr = Math.round(w.rhr + between(-3, 3) + (crunch ? 6 : 0) + (feverish ? 9 : 0));
+    wearable.push({
+      personId: id,
+      date,
+      restingHeartRate: rhr,
+      heartRate: Math.round(rhr + between(8, 22)),
+      systolic: Math.round(w.sys + between(-5, 5) + (crunch ? 6 : 0)),
+      diastolic: Math.round(w.dia + between(-4, 4) + (crunch ? 4 : 0)),
+      spo2: Math.round(between(96, 99.4)),
+      skinTempDeltaC: feverish ? 0.9 : round1(between(-0.3, 0.3)),
+      steps: Math.round((w.steps + between(-1800, 1800)) * (isWeekday(date) ? 1 : 1.2) * (date === TODAY ? 0.45 : 1)),
+      activeMinutes: Math.round(between(15, 55) * (date === TODAY ? 0.45 : 1)),
+      hrvMs: Math.round(between(38, 62) - (crunch ? 14 : 0) - (feverish ? 12 : 0)),
+      stressScore: Math.round(clamp(between(22, 48) + (crunch ? 30 : 0) + (feverish ? 15 : 0), 0, 100)),
+    });
+  }
+}
+write('wearable.json', wearable);

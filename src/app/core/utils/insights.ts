@@ -14,9 +14,6 @@ export const FRAMEWORK_TIPS = {
   outlook: 'Simple rules over the last 5 working days, not AI. Each line says why it appears.',
 } as const;
 
-export const MOOD_EMOJI = ['😞', '😕', '😐', '🙂', '😄'] as const;
-export const moodEmoji = (mood: number) => MOOD_EMOJI[Math.min(5, Math.max(1, Math.round(mood))) - 1];
-
 export const DONE_STATUSES: TaskStatus[] = ['completed', 'reported', 'accepted'];
 export const isDone = (t: Task) => DONE_STATUSES.includes(t.status);
 export const isOpen = (t: Task) => !isDone(t);
@@ -51,29 +48,28 @@ export const flowHours = (logs: FocusLog[]) => logs.reduce((s, l) => s + l.hours
 
 /**
  * Maslach-inspired strain signals (0–100, higher = more strain).
- * exhaustion ← low energy, high stress, short sleep · cynicism ← low mood · reduced efficacy ← low focus and unfinished tasks
+ * exhaustion ← low energy, high stress · cynicism ← low WHO-5 wellbeing (less cheer and interest)
+ * reduced efficacy ← low focus and unfinished tasks
  */
-export function burnoutSignals(checkIns: CheckIn[], tasks: Task[]) {
+export function burnoutSignals(checkIns: CheckIn[], tasks: Task[], who5Scores: number[]) {
   if (!checkIns.length) return { exhaustion: 0, cynicism: 0, efficacy: 0 };
   const lowEnergy = average(checkIns.map((c) => (5 - c.energy) / 4));
   const stress = average(checkIns.map((c) => (c.stress - 1) / 4));
-  const shortSleep = checkIns.filter((c) => c.sleepHours < 6).length / checkIns.length;
-  const lowMood = average(checkIns.map((c) => (5 - c.mood) / 4));
   const lowFocus = average(checkIns.map((c) => (5 - c.focus) / 4));
   const unfinished = tasks.length ? tasks.filter(isOpen).length / tasks.length : 0;
   return {
-    exhaustion: Math.round(((lowEnergy + stress + shortSleep) / 3) * 100),
-    cynicism: Math.round(lowMood * 100),
+    exhaustion: Math.round(((lowEnergy + stress) / 2) * 100),
+    cynicism: who5Scores.length ? Math.round(100 - average(who5Scores)) : 0,
     /** Shown as "reduced efficacy": higher means less sense of getting things done. */
     efficacy: Math.round(((lowFocus + unfinished) / 2) * 100),
   };
 }
 
-/** Consecutive most recent check-ins with under 6h of sleep. */
-export function shortSleepStreak(checkIns: CheckIn[]): number {
+/** Consecutive most recent check-ins where `test` holds. */
+export function streak(checkIns: CheckIn[], test: (c: CheckIn) => boolean): number {
   let n = 0;
   for (const c of [...checkIns].sort((a, b) => b.date.localeCompare(a.date))) {
-    if (c.sleepHours < 6) n++;
+    if (test(c)) n++;
     else break;
   }
   return n;
@@ -119,9 +115,9 @@ export function personInsights(person: Member, checkIns: CheckIn[], logs: FocusL
     out.push(`Strong in ${strengths.slice(0, 2).map((s) => s.label).join(' and ')}, no weak areas below 3/5.`);
   }
 
-  // Sleep
-  const streak = shortSleepStreak(checkIns);
-  if (streak >= 3) out.push(`Slept under 6h for ${streak} days – lighter load suggested.`);
+  // Stress streak
+  const stressed = streak(checkIns, (c) => c.stress >= 4);
+  if (stressed >= 3) out.push(`Stress has been 4/5 or higher for ${stressed} days in a row – lighter load suggested.`);
 
   // Best deep-work window
   const byHour = new Map<number, number>();
@@ -134,14 +130,14 @@ export function personInsights(person: Member, checkIns: CheckIn[], logs: FocusL
   if (todayLoad > 110) out.push(`Today is planned at ${todayLoad}% of capacity.`);
   if (blockedReason) out.push(`Blocked right now: ${blockedReason.charAt(0).toLowerCase() + blockedReason.slice(1)}.`);
 
-  // Mood trend
+  // Energy trend
   const sorted = [...checkIns].sort((a, b) => a.date.localeCompare(b.date));
   const last5 = sorted.slice(-5);
   const prev5 = sorted.slice(-10, -5);
   if (last5.length >= 3 && prev5.length >= 3) {
-    const diff = average(last5.map((c) => c.mood)) - average(prev5.map((c) => c.mood));
-    if (diff <= -0.6) out.push('Mood has dipped compared with the week before. A short 1:1 could help.');
-    else if (diff >= 0.6) out.push('Mood is up compared with the week before.');
+    const diff = average(last5.map((c) => c.energy)) - average(prev5.map((c) => c.energy));
+    if (diff <= -0.6) out.push('Energy has dipped compared with the week before. A short 1:1 could help.');
+    else if (diff >= 0.6) out.push('Energy is up compared with the week before.');
   }
   return out;
 }
@@ -157,14 +153,10 @@ export function nextWeekOutlook(checkIns: CheckIn[], todayLoad: number): Outlook
   if (recent.length < 3) return { level: 'Low', reasons: ['Not enough recent check-ins to see a pattern yet.'] };
   const reasons: string[] = [];
   let points = 0;
-  const sleep = round(average(recent.map((c) => c.sleepHours)), 1);
-  const streak = shortSleepStreak(checkIns);
-  if (streak >= 3) {
-    points += 2;
-    reasons.push(`Slept under 6h on each of the last ${streak} days.`);
-  } else if (sleep < 6.5) {
+  const stressed = streak(checkIns, (c) => c.stress >= 4);
+  if (stressed >= 3) {
     points += 1;
-    reasons.push(`Average sleep is ${sleep}h over the last ${recent.length} check-ins.`);
+    reasons.push(`Stress was 4/5 or higher on each of the last ${stressed} days.`);
   }
   if (todayLoad >= 120) {
     points += 2;
@@ -174,7 +166,7 @@ export function nextWeekOutlook(checkIns: CheckIn[], todayLoad: number): Outlook
     reasons.push(`Today is planned at ${todayLoad}% of capacity.`);
   }
   const stress = round(average(recent.map((c) => c.stress)), 1);
-  if (stress >= 3.8) {
+  if (stress >= 3.8 && stressed < 3) {
     points += 1;
     reasons.push(`Stress averaged ${stress}/5 recently.`);
   }
@@ -188,6 +180,6 @@ export function nextWeekOutlook(checkIns: CheckIn[], todayLoad: number): Outlook
     points += 1;
     reasons.push(`Felt unwell on ${unwell} of the last ${recent.length} days.`);
   }
-  if (!reasons.length) reasons.push(`Sleep (${sleep}h), stress (${stress}/5) and workload all look balanced.`);
+  if (!reasons.length) reasons.push(`Energy (${energy}/5), stress (${stress}/5) and workload all look balanced.`);
   return { level: points >= 3 ? 'High' : points >= 1 ? 'Medium' : 'Low', reasons };
 }

@@ -4,7 +4,7 @@ import { CheckIn } from '../../core/models';
 import { FilterService } from '../../core/services/filter.service';
 import { TeamStore } from '../../core/services/team-store.service';
 import { addDays, average, formatDay, formatDayShort, MOCK_TODAY, round, weekStart } from '../../core/utils/date';
-import { burnoutSignals, FRAMEWORK_TIPS, isFlowHour, who5Score } from '../../core/utils/insights';
+import { burnoutSignals, FRAMEWORK_TIPS, isFlowHour, isUnwell, who5Score } from '../../core/utils/insights';
 import { Chart } from '../../shared/charts/chart';
 import { InfoTip } from '../../shared/info-tip/info-tip';
 import { KpiCard } from '../../shared/kpi-card/kpi-card';
@@ -40,17 +40,18 @@ export class WellbeingPage {
     const cur = this.current();
     const prev = this.previous();
     const enough = cur.length >= MIN_GROUP;
-    const avg = (list: CheckIn[], k: 'energy' | 'mood' | 'focus' | 'stress') => round(average(list.map((c) => c[k])), 1);
-    const delta = (k: 'energy' | 'mood' | 'focus' | 'stress') => (enough && prev.length >= MIN_GROUP ? avg(cur, k) - avg(prev, k) : null);
+    const avg = (list: CheckIn[], k: 'energy' | 'focus' | 'stress') => round(average(list.map((c) => c[k])), 1);
+    const delta = (k: 'energy' | 'focus' | 'stress') => (enough && prev.length >= MIN_GROUP ? avg(cur, k) - avg(prev, k) : null);
+    const wellPct = (list: CheckIn[]) => Math.round((list.filter((c) => !isUnwell(c)).length / Math.max(1, list.length)) * 100);
     return {
       enough,
       count: cur.length,
       energy: avg(cur, 'energy'),
-      mood: avg(cur, 'mood'),
+      well: wellPct(cur),
       focus: avg(cur, 'focus'),
       stress: avg(cur, 'stress'),
       dEnergy: delta('energy'),
-      dMood: delta('mood'),
+      dWell: enough && prev.length >= MIN_GROUP ? wellPct(cur) - wellPct(prev) : null,
       dFocus: delta('focus'),
       dStress: delta('stress'),
       compare: { today: 'vs yesterday', week: 'vs the week before', month: 'vs the month before' }[this.filter.range()],
@@ -65,7 +66,7 @@ export class WellbeingPage {
   protected readonly trend = computed<ApexOptions>(() => {
     const checkIns = this.store.checkIns();
     const weeks = this.weeks();
-    const series = (k: 'energy' | 'mood' | 'focus' | 'stress') =>
+    const series = (k: 'energy' | 'focus' | 'stress') =>
       weeks.map((w) => {
         const list = checkIns.filter((c) => weekStart(c.date) === w);
         return list.length >= MIN_GROUP ? round(average(list.map((c) => c[k])), 1) : null;
@@ -74,12 +75,11 @@ export class WellbeingPage {
       chart: { type: 'line', zoom: { enabled: false } },
       series: [
         { name: 'Energy', data: series('energy') },
-        { name: 'Mood', data: series('mood') },
         { name: 'Focus', data: series('focus') },
         { name: 'Stress', data: series('stress') },
       ],
-      colors: ['#3fae6a', '#6d5dd3', '#2f6fed', '#d9822b'],
-      stroke: { width: 2.5, curve: 'smooth', dashArray: [0, 0, 0, 5] },
+      colors: ['#3fae6a', '#2f6fed', '#d9822b'],
+      stroke: { width: 2.5, curve: 'smooth', dashArray: [0, 0, 5] },
       markers: { size: 4 },
       xaxis: { categories: weeks.map((w) => formatDayShort(w).replace(/^\w+ /, '') + ' ' + new Date(w + 'T00:00:00Z').toLocaleDateString('en-IN', { month: 'short', timeZone: 'UTC' })) },
       yaxis: { min: 1, max: 5, tickAmount: 4 },
@@ -125,7 +125,8 @@ export class WellbeingPage {
     const from = this.filter.range() === 'today' ? addDays(MOCK_TODAY, -6) : this.filter.from();
     const checkIns = this.between(from, MOCK_TODAY);
     const tasks = this.store.tasks().filter((t) => t.date >= from && t.date <= MOCK_TODAY);
-    const b = burnoutSignals(checkIns, tasks);
+    const who5 = this.store.who5().filter((w) => w.weekStart >= weekStart(from)).map((w) => who5Score(w.answers));
+    const b = burnoutSignals(checkIns, tasks, who5);
     return {
       chart: { type: 'bar' },
       series: [{ name: 'Team strain', data: [b.exhaustion, b.cynicism, b.efficacy] }],

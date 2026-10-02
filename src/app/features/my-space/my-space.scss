@@ -230,3 +230,54 @@
 .disclaimer {
   margin: var(--s2) 0 0;
 }
+
+.health-btn {
+  width: 100%;
+  margin-top: var(--s3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px var(--s2);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, #e05a5a 35%, var(--pulse-border));
+  background: linear-gradient(135deg, color-mix(in srgb, #e05a5a 10%, var(--pulse-surface)), var(--pulse-surface));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: #e05a5a;
+    outline: none;
+  }
+
+  > .material-symbols-outlined:first-child {
+    color: #e05a5a;
+    font-size: 28px;
+  }
+
+  .text {
+    flex: 1;
+    display: grid;
+    gap: 2px;
+
+    span {
+      font-size: 0.78rem;
+      color: var(--pulse-muted);
+    }
+  }
+}
+
+.reflect.wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  .row {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}

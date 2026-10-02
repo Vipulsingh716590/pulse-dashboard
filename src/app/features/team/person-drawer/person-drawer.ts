@@ -1,28 +1,25 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { ApexOptions } from 'ng-apexcharts';
 import { ReassignmentService } from '../../../core/services/reassignment.service';
 import { TeamStore } from '../../../core/services/team-store.service';
-import { average, fToC, MOCK_TODAY, round } from '../../../core/utils/date';
-import { DrillDown, inPeriod } from '../../../core/utils/drilldown';
-import { FRAMEWORK_TIPS, isUnwell, moodEmoji, personInsights, STATUS_LABELS, strengthsAndGaps } from '../../../core/utils/insights';
-import { Chart } from '../../../shared/charts/chart';
-import { DrilldownNav } from '../../../shared/charts/drilldown-nav';
+import { fToC, MOCK_TODAY } from '../../../core/utils/date';
+import { FRAMEWORK_TIPS, isUnwell, personInsights, STATUS_LABELS, strengthsAndGaps } from '../../../core/utils/insights';
 import { FocusHeatmap } from '../../../shared/charts/focus-heatmap';
 import { SevenDayTable } from '../../../shared/charts/seven-day-table';
+import { SimpleTrend } from '../../../shared/charts/simple-trend';
 import { SkillRadar } from '../../../shared/charts/skill-radar';
 import { InfoTip } from '../../../shared/info-tip/info-tip';
 import { ReassignCard } from '../../../shared/reassign-card/reassign-card';
 import { StatusDot } from '../../../shared/status-dot/status-dot';
 
 /**
- * Side drawer with progressive depth: Today → last 7 days → trends → skills →
+ * Side drawer with progressive depth: Today → last 7 days → 4-week trend → skills →
  * "Understanding this person" → next-week outlook. Each level opens on click.
  */
 @Component({
   selector: 'app-person-drawer',
-  imports: [MatButtonModule, MatExpansionModule, StatusDot, FocusHeatmap, SevenDayTable, SkillRadar, Chart, DrilldownNav, InfoTip, ReassignCard],
+  imports: [MatButtonModule, MatExpansionModule, StatusDot, FocusHeatmap, SevenDayTable, SkillRadar, SimpleTrend, InfoTip, ReassignCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './person-drawer.html',
   styleUrl: './person-drawer.scss',
@@ -37,13 +34,12 @@ export class PersonDrawer {
 
   protected readonly tips = FRAMEWORK_TIPS;
   protected readonly statusLabels = STATUS_LABELS;
-  protected readonly moodEmoji = moodEmoji;
 
   protected readonly person = computed(() => this.store.member(this.personId()));
   protected readonly status = computed(() => this.store.statusOf(this.personId() ?? ''));
   protected readonly suggestions = computed(() => this.reassignment.forOwner(this.personId() ?? ''));
 
-  private readonly checkIns = computed(() => (this.personId() ? this.store.checkInsFor(this.personId()!) : []));
+  protected readonly checkIns = computed(() => (this.personId() ? this.store.checkInsFor(this.personId()!) : []));
   private readonly logs = computed(() => (this.personId() ? this.store.focusLogsFor(this.personId()!) : []));
 
   // ---- 1. Today ----
@@ -59,43 +55,6 @@ export class PersonDrawer {
       tasks: this.store.tasksToday(id),
       load: this.store.loadOf(id),
       log: this.logs().find((l) => l.date === MOCK_TODAY),
-    };
-  });
-
-  // ---- 3. Month → Week → Day trends ----
-  private readonly dates = computed(() => this.checkIns().map((c) => c.date));
-  protected readonly drill = new DrillDown(this.dates, 'Last 30 working days');
-
-  constructor() {
-    // A new person starts at the top of the drill-down.
-    effect(() => {
-      this.personId();
-      untracked(() => this.drill.goTo(0));
-    });
-  }
-
-  protected readonly trend = computed<ApexOptions>(() => {
-    const checkIns = this.checkIns();
-    const points = this.drill.points();
-    const avg = (p: (typeof points)[number], key: 'mood' | 'energy' | 'focus' | 'stress') =>
-      round(average(checkIns.filter((c) => inPeriod(c.date, p)).map((c) => c[key])), 1);
-    const highlight = this.drill.highlighted();
-    return {
-      chart: { type: 'line', zoom: { enabled: false } },
-      series: [
-        { name: 'Mood', data: points.map((p) => avg(p, 'mood')) },
-        { name: 'Energy', data: points.map((p) => avg(p, 'energy')) },
-        { name: 'Focus', data: points.map((p) => avg(p, 'focus')) },
-        { name: 'Stress', data: points.map((p) => avg(p, 'stress')) },
-      ],
-      colors: ['#6d5dd3', '#3fae6a', '#2f6fed', '#d9822b'],
-      stroke: { width: 2, curve: 'smooth', dashArray: [0, 0, 0, 4] },
-      markers: { size: 4 },
-      xaxis: { categories: points.map((p) => p.shortLabel) },
-      yaxis: { min: 1, max: 5, tickAmount: 4 },
-      legend: { position: 'top', horizontalAlign: 'left' },
-      tooltip: { shared: true, intersect: false },
-      annotations: highlight >= 0 ? { xaxis: [{ x: points[highlight]?.shortLabel, borderColor: '#6d5dd3' }] } : {},
     };
   });
 

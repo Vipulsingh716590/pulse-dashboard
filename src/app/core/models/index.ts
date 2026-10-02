@@ -92,9 +92,7 @@ export interface CheckIn {
   symptoms?: string;
   /** Only when true may the manager see temperature and symptoms. */
   shareDetails?: boolean;
-  sleepHours: number;
   energy: number;
-  mood: number;
   stress: number;
   focus: number;
   note?: string;
@@ -162,4 +160,23 @@ export type RiskLevel = 'Low' | 'Medium' | 'High';
 export interface Outlook {
   level: RiskLevel;
   reasons: string[];
+}
+
+/** One day of smartwatch data. Private: only the developer themself ever sees it. */
+export interface WearableReading {
+  personId: string;
+  date: string;
+  restingHeartRate: number;
+  heartRate: number;
+  /** Blood pressure only on devices that measure it. */
+  systolic?: number;
+  diastolic?: number;
+  spo2: number;
+  /** Skin temperature vs the person's own normal, in °C. */
+  skinTempDeltaC: number;
+  steps: number;
+  activeMinutes: number;
+  hrvMs: number;
+  /** The device's own 0–100 stress score. */
+  stressScore: number;
 }

@@ -5,7 +5,6 @@ import { MatSliderModule } from '@angular/material/slider';
 import { CheckIn } from '../../core/models';
 import { CheckInService } from '../../core/services/check-in.service';
 import { fToC, MOCK_TODAY, mockNow } from '../../core/utils/date';
-import { MOOD_EMOJI } from '../../core/utils/insights';
 
 /** The 1-minute daily check-in. Unwell or 100°F+ triggers the automatic health flow. */
 @Component({
@@ -21,14 +20,11 @@ export class CheckInForm {
   readonly personId = input.required<string>();
   readonly saved = output<{ unwell: boolean; suggestions: number }>();
 
-  protected readonly moods = MOOD_EMOJI;
   protected readonly feelingWell = signal(true);
   protected readonly temperature = signal<number | null>(null);
   protected readonly symptoms = signal('');
   protected readonly shareDetails = signal(false);
-  protected readonly sleep = signal(7);
   protected readonly energy = signal(3);
-  protected readonly mood = signal(4);
   protected readonly focus = signal(3);
   protected readonly stress = signal(2);
   protected readonly note = signal('');
@@ -44,9 +40,7 @@ export class CheckInForm {
     this.temperature.set(c.temperatureF ?? null);
     this.symptoms.set(c.symptoms ?? '');
     this.shareDetails.set(!!c.shareDetails);
-    this.sleep.set(c.sleepHours);
     this.energy.set(c.energy);
-    this.mood.set(c.mood);
     this.focus.set(c.focus);
     this.stress.set(c.stress);
     this.note.set(c.note ?? '');
@@ -67,9 +61,7 @@ export class CheckInForm {
       ...(this.temperature() ? { temperatureF: this.temperature()! } : {}),
       ...(this.unwell() && this.symptoms().trim() ? { symptoms: this.symptoms().trim() } : {}),
       shareDetails: this.unwell() && this.shareDetails(),
-      sleepHours: this.sleep(),
       energy: this.energy(),
-      mood: this.mood(),
       stress: this.stress(),
       focus: this.focus(),
       ...(this.note().trim() ? { note: this.note().trim() } : {}),

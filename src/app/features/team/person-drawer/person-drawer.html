@@ -23,11 +23,10 @@
           <p><strong>Unwell – needs rest.</strong> {{ t.details }}</p>
         } @else {
           <div class="vitals">
-            <span><b>{{ moodEmoji(t.checkIn.mood) }}</b> Mood {{ t.checkIn.mood }}/5</span>
+            <span>Feeling well</span>
             <span>Energy {{ t.checkIn.energy }}/5</span>
             <span>Focus {{ t.checkIn.focus }}/5</span>
             <span>Stress {{ t.checkIn.stress }}/5</span>
-            <span>Slept {{ t.checkIn.sleepHours }}h</span>
           </div>
         }
       </section>
@@ -80,12 +79,11 @@
 
         <mat-expansion-panel>
           <mat-expansion-panel-header>
-            <mat-panel-title>3 · Trends</mat-panel-title>
-            <mat-panel-description>Month → Week → Day</mat-panel-description>
+            <mat-panel-title>3 · Last 4 weeks</mat-panel-title>
+            <mat-panel-description>Energy, focus, stress</mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            <app-drilldown-nav [drill]="drill" />
-            <app-chart [options]="trend()" [height]="240" (pointSelect)="drill.drillInto($event)" />
+            <app-simple-trend [checkIns]="checkIns()" />
           </ng-template>
         </mat-expansion-panel>
 

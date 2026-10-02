@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { TeamStore } from '../../core/services/team-store.service';
 import { addDays, formatDay, MOCK_TODAY } from '../../core/utils/date';
-import { isDone, isUnwell, moodEmoji } from '../../core/utils/insights';
+import { isDone, isUnwell } from '../../core/utils/insights';
 
-/** Day | Health | Mood | Focus | Tasks done | Note, for the last 7 working days. */
+/** Day | Health | Energy | Focus | Stress | Tasks done | Note, for the last 7 working days. */
 @Component({
   selector: 'app-seven-day-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -11,15 +11,16 @@ import { isDone, isUnwell, moodEmoji } from '../../core/utils/insights';
     <div class="wrap">
       <table>
         <thead>
-          <tr><th>Day</th><th>Health</th><th>Mood</th><th>Focus</th><th>Tasks done</th><th>Note</th></tr>
+          <tr><th>Day</th><th>Health</th><th>Energy</th><th>Focus</th><th>Stress</th><th>Tasks done</th><th>Note</th></tr>
         </thead>
         <tbody>
           @for (r of rows(); track r.date) {
             <tr>
               <td class="day">{{ r.label }}</td>
               <td><span class="health" [class]="r.healthClass">{{ r.health }}</span></td>
-              <td>{{ r.mood }}</td>
+              <td>{{ r.energy }}</td>
               <td>{{ r.focus }}</td>
+              <td>{{ r.stress }}</td>
               <td>{{ r.done }}</td>
               <td class="note">{{ r.note }}</td>
             </tr>
@@ -65,8 +66,9 @@ export class SevenDayTable {
         label: date === MOCK_TODAY ? 'Today' : formatDay(date),
         health: !c ? 'No check-in' : unwell ? (showTemp ? `Unwell · ${c.temperatureF}°F` : 'Unwell – rest') : 'Well',
         healthClass: !c ? '' : unwell ? 'unwell' : 'well',
-        mood: c ? moodEmoji(c.mood) + ' ' + c.mood + '/5' : '—',
+        energy: c ? c.energy + '/5' : '—',
         focus: c ? c.focus + '/5' : '—',
+        stress: c ? c.stress + '/5' : '—',
         done: `${dayTasks.filter(isDone).length} of ${dayTasks.length}`,
         note: c?.note ?? '',
       });
