@@ -24,7 +24,7 @@ Production build: `npm run build` (output in `dist/pulse-dashboard`).
 | `/` | Overview: 3D coin hero + org chart, then KPIs, donut, grouped bar, radar and 6-month trend with Month → Week → Day drill-down | everyone |
 | `/team` | Person cards (health first, then today's %, then current task) and a side drawer with 6 levels of depth | Manager |
 | `/tasks` | Daily signal board: 6 progress rings, task rows with Accept, smart reassignment | everyone (Accept / Approve for Manager) |
-| `/wellbeing` | Team averages only: energy, mood, focus, stress, WHO-5, Maslach bars, flow hours | everyone |
+| `/wellbeing` | Team averages only: feeling well %, energy, focus, stress, WHO-5, Maslach bars, flow hours | everyone |
 | `/my-space` | Health check-in, my tasks, 7-day table, 4-week trend, skill radar + one small step, Stoic reflection, outlook, private **My Health Data** (watch) | the selected developer |
 
 The top bar's **Today / Week / Month** filter sets the Overview drill-down level and the range on Tasks and Wellbeing.
