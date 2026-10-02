@@ -1,0 +1,75 @@
+@if (!viewingAs.isManager()) {
+  <div class="page"><app-manager-only title="The Team page" /></div>
+} @else {
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <h1>Web Team today</h1>
+        <p>{{ date }}</p>
+      </div>
+    </div>
+
+    @let s = summary();
+    <section class="grid12">
+      <!-- Most important number, top-left -->
+      <div class="card c8 summary">
+        <div class="headline">
+          <span class="big">{{ s.available }}<small> of {{ s.total }}</small></span>
+          <span class="muted">people available today</span>
+        </div>
+        <dl class="stats">
+          <div><dt>Checked in</dt><dd>{{ s.checkedIn }} of {{ s.total }}</dd></div>
+          <div><dt>Tasks done</dt><dd>{{ s.done }} of {{ s.tasks }}</dd></div>
+          <div><dt>Suggestions</dt><dd>{{ reassignment.suggestions().length }}</dd></div>
+        </dl>
+        <ul class="legend">
+          @for (c of s.counts; track c.status) {
+            <li [class.zero]="!c.n"><app-status-dot [status]="c.status" [label]="true" [text]="c.label + ' · ' + c.n" /></li>
+          }
+        </ul>
+      </div>
+
+      <!-- Alerts sit top-right, near the bell -->
+      <div class="card c4 alerts">
+        <div class="card-head"><h2>Needs you</h2></div>
+        <ul>
+          @for (a of alerts(); track a.id) {
+            <li>
+              <button type="button" (click)="selectedId.set(a.personId)">
+                <app-status-dot [status]="a.status" />
+                <span class="text">
+                  <strong>{{ a.title }}</strong>
+                  <span>{{ a.detail }}</span>
+                </span>
+              </button>
+            </li>
+          } @empty {
+            <li class="muted">Nothing needs you right now.</li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid12 people" aria-label="People">
+      @for (m of store.members(); track m.id) {
+        <app-person-card class="c4" [personId]="m.id" (open)="selectedId.set($event)" />
+      }
+    </section>
+
+    @if (reassignment.suggestions().length) {
+      <section class="card sugs">
+        <div class="card-head">
+          <h2>Suggested reassignments</h2>
+          <a routerLink="/tasks" class="small">Open task board</a>
+        </div>
+        <div class="grid12">
+          @for (sug of reassignment.suggestions().slice(0, 6); track sug.key) {
+            <app-reassign-card class="c4" [suggestion]="sug" />
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  <app-person-drawer [personId]="selectedId()" (closed)="selectedId.set(null)" />
+}

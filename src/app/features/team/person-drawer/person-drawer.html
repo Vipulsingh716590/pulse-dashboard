@@ -1,0 +1,143 @@
+@if (person(); as p) {
+  <div class="backdrop" (click)="close()" aria-hidden="true"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="p.name + ' details'">
+    <header class="head">
+      <span class="avatar" [style.background]="p.avatarColor">{{ p.initials }}</span>
+      <div class="who">
+        <h2>{{ p.name }}</h2>
+        <span class="muted small">{{ p.position }}</span>
+      </div>
+      <button mat-icon-button (click)="close()" aria-label="Close">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="body">
+      @let t = today();
+      <!-- Health and availability first -->
+      <section class="health" [class]="status()">
+        <app-status-dot [status]="status()" [label]="true" />
+        @if (!t.checkIn) {
+          <p>{{ t.note ?? 'Not checked in yet today.' }}</p>
+        } @else if (t.unwell) {
+          <p><strong>Unwell – needs rest.</strong> {{ t.details }}</p>
+        } @else {
+          <div class="vitals">
+            <span><b>{{ moodEmoji(t.checkIn.mood) }}</b> Mood {{ t.checkIn.mood }}/5</span>
+            <span>Energy {{ t.checkIn.energy }}/5</span>
+            <span>Focus {{ t.checkIn.focus }}/5</span>
+            <span>Stress {{ t.checkIn.stress }}/5</span>
+            <span>Slept {{ t.checkIn.sleepHours }}h</span>
+          </div>
+        }
+      </section>
+
+      @if (suggestions().length) {
+        <section class="sugs">
+          @for (s of suggestions(); track s.key) {
+            <app-reassign-card [suggestion]="s" />
+          }
+        </section>
+      }
+
+      <mat-accordion multi displayMode="flat" class="levels">
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title>1 · Today</mat-panel-title>
+            <mat-panel-description>{{ t.tasks.length }} tasks · {{ t.load }}% load</mat-panel-description>
+          </mat-expansion-panel-header>
+          <ul class="tasks">
+            @for (task of t.tasks; track task.id) {
+              <li>
+                <div class="row">
+                  <span class="title">
+                    @if (task.status === 'in-progress' && !task.blocked && status() !== 'resting') {
+                      <span class="live" aria-label="Live"></span>
+                    }
+                    {{ task.title }}
+                  </span>
+                  <span class="muted small">{{ task.percentDone }}%</span>
+                </div>
+                <div class="bar"><span [style.width.%]="task.percentDone"></span></div>
+                <span class="muted small">{{ statusLabels[task.status] }}@if (task.blocked) { · 🟡 {{ task.blockedReason }}}</span>
+              </li>
+            } @empty {
+              <li class="muted">No tasks planned today.</li>
+            }
+          </ul>
+          <h3 class="sub">Focus, 9 AM – 5 PM</h3>
+          <app-focus-heatmap [log]="t.log" />
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>2 · Last 7 days</mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-seven-day-table [personId]="p.id" />
+          </ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>3 · Trends</mat-panel-title>
+            <mat-panel-description>Month → Week → Day</mat-panel-description>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-drilldown-nav [drill]="drill" />
+            <app-chart [options]="trend()" [height]="240" (pointSelect)="drill.drillInto($event)" />
+          </ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>4 · Skills</mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-skill-radar [skills]="p.skills" [height]="260" />
+            <div class="chips">
+              @for (s of skills().strengths; track s.area) {
+                <span class="chip strong">{{ s.label }} {{ s.score }}/5</span>
+              }
+              @for (g of skills().gaps; track g.area) {
+                <span class="chip gap">{{ g.label }} {{ g.score }}/5</span>
+              }
+            </div>
+            <p class="muted small">Green = strength (4–5), amber = still growing (1–2).</p>
+          </ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>5 · Understanding this person</mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul class="insights">
+            @for (line of insights(); track $index) {
+              <li>{{ line }}</li>
+            } @empty {
+              <li class="muted">Not enough check-ins yet to see patterns.</li>
+            }
+          </ul>
+          <p class="disclaimer">Based on their own check-ins and focus logs. Wellbeing tool, not medical advice.</p>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>6 · Next-week outlook</mat-panel-title>
+            @if (outlook(); as o) {
+              <mat-panel-description><span class="risk" [class]="o.level">{{ o.level }} risk</span></mat-panel-description>
+            }
+          </mat-expansion-panel-header>
+          @if (outlook(); as o) {
+            <p class="risk-line"><span class="risk" [class]="o.level">{{ o.level }}</span> <app-info-tip [text]="tips.outlook" /></p>
+            <ul class="insights">
+              @for (r of o.reasons; track $index) {
+                <li>{{ r }}</li>
+              }
+            </ul>
+          }
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </aside>
+}
