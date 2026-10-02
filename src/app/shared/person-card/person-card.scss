@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.person {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-content: start;
+  gap: var(--s2);
+  padding: var(--s3);
+  box-sizing: border-box;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: var(--pulse-surface);
+  border: 1px solid var(--pulse-border);
+  border-radius: var(--pulse-radius);
+  box-shadow: var(--pulse-shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--pulse-accent);
+    outline: none;
+  }
+
+  &.attention {
+    border-color: color-mix(in srgb, var(--status-attention) 45%, var(--pulse-border));
+  }
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.who {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+
+  span {
+    font-size: 0.8rem;
+    color: var(--pulse-muted);
+  }
+}
+
+.chev {
+  color: var(--pulse-muted);
+}
+
+.health {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--pulse-surface-2);
+
+  .line {
+    font-size: 0.82rem;
+    color: var(--pulse-muted);
+  }
+
+  .mood {
+    margin-right: 2px;
+  }
+}
+
+.progress {
+  display: grid;
+  gap: 6px;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+  }
+
+  .over {
+    color: var(--status-attention);
+    font-weight: 600;
+  }
+}
+
+.now {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding-top: 12px;
+  border-top: 1px solid var(--pulse-border);
+
+  .task {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.sig {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+
+  &.live {
+    background: var(--status-working);
+    animation: live 1.6s ease-in-out infinite;
+  }
+
+  &.blocked {
+    background: var(--status-blocked);
+  }
+
+  &.idle {
+    background: var(--status-offline);
+  }
+}
+
+@keyframes live {
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--status-working) 20%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sig.live {
+    animation: none;
+  }
+}

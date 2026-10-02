@@ -1,0 +1,54 @@
+@if (person(); as p) {
+  <button type="button" class="person" [class]="status()" (click)="open.emit(p.id)" [attr.aria-label]="'Open details for ' + p.name">
+    <header>
+      <span class="avatar" [style.background]="p.avatarColor">{{ p.initials }}</span>
+      <div class="who">
+        <strong>{{ p.name }}</strong>
+        <span>{{ p.position }}</span>
+      </div>
+      <span class="chev material-symbols-outlined" aria-hidden="true">chevron_right</span>
+    </header>
+
+    <!-- 1. Health and availability come first -->
+    <div class="health">
+      <app-status-dot [status]="status()" [label]="true" />
+      <span class="line">
+        @if (health().mood) {
+          <span class="mood" aria-hidden="true">{{ health().mood }}</span>
+        }
+        {{ health().line }}
+      </span>
+    </div>
+
+    <!-- 2. Today's work -->
+    @let t = today();
+    <div class="progress">
+      <div class="row">
+        <span>Today's tasks</span>
+        <strong>{{ t.pct }}%</strong>
+      </div>
+      <div class="bar"><span [style.width.%]="t.pct"></span></div>
+      <div class="row muted small">
+        <span>{{ t.done }} of {{ t.total }} done</span>
+        <span [class.over]="t.load > 100">{{ t.load }}% load</span>
+      </div>
+    </div>
+
+    <!-- 3. What they are on right now -->
+    <div class="now">
+      @if (current(); as task) {
+        @if (task.blocked) {
+          <span class="sig blocked" aria-hidden="true"></span>
+        } @else if (task.status === 'in-progress' && status() !== 'resting') {
+          <span class="sig live" aria-hidden="true"></span>
+        } @else {
+          <span class="sig idle" aria-hidden="true"></span>
+        }
+        <span class="task">{{ task.title }}</span>
+      } @else {
+        <span class="sig idle" aria-hidden="true"></span>
+        <span class="task muted">No open tasks</span>
+      }
+    </div>
+  </button>
+}
