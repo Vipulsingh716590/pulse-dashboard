@@ -1,0 +1,92 @@
+<header class="topbar">
+  <div class="left">
+    <span class="logo">
+      @if (!logoFailed()) {
+        <img src="assets/brand/mobikwik-logo.svg" alt="MobiKwik" (error)="logoFailed.set(true)" />
+      } @else {
+        <span class="logo-text">MobiKwik</span>
+      }
+    </span>
+    <span class="divider" aria-hidden="true"></span>
+    <h1 class="title">{{ title() }}</h1>
+  </div>
+
+  <mat-button-toggle-group
+    class="range"
+    [value]="filter.range()"
+    (change)="setRange($event.value)"
+    aria-label="Date filter"
+    hideSingleSelectionIndicator
+  >
+    <mat-button-toggle value="today">Today</mat-button-toggle>
+    <mat-button-toggle value="week">Week</mat-button-toggle>
+    <mat-button-toggle value="month">Month</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <div class="right">
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="bell"
+      [attr.aria-label]="'Notifications, ' + notifications.unread() + ' unread'"
+      matTooltip="Notifications"
+    >
+      <span
+        class="material-symbols-outlined"
+        [matBadge]="notifications.unread() || null"
+        matBadgeColor="warn"
+        matBadgeSize="medium"
+        aria-hidden="true"
+        >notifications</span
+      >
+    </button>
+    <mat-menu #bell="matMenu" class="bell-menu" xPosition="before">
+      <div class="bell-head" (click)="$event.stopPropagation()">
+        <strong>Notifications</strong>
+        @if (notifications.unread()) {
+          <button mat-button (click)="notifications.markAllRead()">Mark all read</button>
+        }
+      </div>
+      @for (n of notifications.mine().slice(0, limit); track n.id) {
+        <button mat-menu-item class="note" [class.unread]="!n.read" (click)="openNotification(n)">
+          <span class="kind material-symbols-outlined" [class]="n.kind" aria-hidden="true">{{ kindIcon[n.kind] }}</span>
+          <span class="text">
+            <strong>{{ n.title }}</strong>
+            @if (n.body) {
+              <span>{{ n.body }}</span>
+            }
+            <small>{{ time(n.createdAt) }}</small>
+          </span>
+        </button>
+      } @empty {
+        <p class="none">You're all caught up.</p>
+      }
+      @if (notifications.mine().length > limit) {
+        <p class="none">+{{ notifications.mine().length - limit }} older</p>
+      }
+    </mat-menu>
+
+    <button
+      mat-icon-button
+      (click)="theme.toggle()"
+      [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+      [matTooltip]="theme.mode() === 'dark' ? 'Light mode' : 'Dark mode'"
+    >
+      <span class="material-symbols-outlined" aria-hidden="true">{{ theme.mode() === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
+    </button>
+
+    <label class="viewing">
+      <span class="caption">Viewing as</span>
+      <mat-select
+        class="viewer"
+        [value]="viewingAs.viewerId()"
+        (valueChange)="switchViewer($event)"
+        aria-label="Viewing as"
+        panelClass="viewer-panel"
+      >
+        @for (p of viewingAs.options(); track p.id) {
+          <mat-option [value]="p.id">{{ p.role === 'manager' ? 'Manager' : p.name }}</mat-option>
+        }
+      </mat-select>
+    </label>
+  </div>
+</header>

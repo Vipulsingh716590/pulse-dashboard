@@ -1,0 +1,130 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s3);
+  background: color-mix(in srgb, var(--pulse-surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--pulse-border);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.logo {
+  height: 32px;
+  display: flex;
+  align-items: center;
+
+  img {
+    height: 32px;
+    width: auto;
+  }
+
+  .logo-text {
+    font-weight: 700;
+    color: var(--brand-blue);
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--pulse-border);
+}
+
+.title {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.range {
+  flex: none;
+  border-radius: 12px;
+
+  --mat-button-toggle-height: 36px;
+}
+
+:host ::ng-deep .range .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  line-height: 36px;
+  padding: 0 14px;
+  font-size: 0.85rem;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.viewing {
+  display: grid;
+  margin-left: var(--s1);
+  padding: 4px 12px;
+  border: 1px solid var(--pulse-border);
+  border-radius: 12px;
+  min-width: 150px;
+  cursor: pointer;
+
+  .caption {
+    font-size: 0.68rem;
+    color: var(--pulse-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .viewer {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablets: tighter */
+@media (max-width: 1024px) {
+  .topbar {
+    padding: 0 var(--s2);
+  }
+
+  .divider,
+  .title {
+    display: none;
+  }
+}
+
+/* Phones: two rows, the date filter gets its own line */
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: var(--s1);
+    padding: var(--s1) var(--s2);
+  }
+
+  .left {
+    flex: 1;
+  }
+
+  .range {
+    order: 3;
+    width: 100%;
+
+    mat-button-toggle {
+      flex: 1;
+    }
+  }
+
+  .viewing {
+    min-width: 120px;
+    margin-left: 0;
+  }
+}
