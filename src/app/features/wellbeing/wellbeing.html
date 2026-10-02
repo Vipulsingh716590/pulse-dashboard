@@ -1,0 +1,66 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1>How the team is doing</h1>
+      <p>{{ filter.label() }} · team averages from {{ people() }} people. No individual scores on this page.</p>
+    </div>
+  </div>
+
+  @let k = kpis();
+  @if (k.enough) {
+    <section class="grid12 kpis">
+      <app-kpi-card class="c3" label="Energy" [value]="k.energy" unit="/5" [delta]="k.dEnergy" deltaUnit="" [deltaLabel]="k.compare" />
+      <app-kpi-card class="c3" label="Mood" [value]="k.mood" unit="/5" [delta]="k.dMood" deltaUnit="" [deltaLabel]="k.compare" />
+      <app-kpi-card class="c3" label="Focus" [value]="k.focus" unit="/5" [delta]="k.dFocus" deltaUnit="" [deltaLabel]="k.compare" />
+      <app-kpi-card class="c3" label="Stress" [value]="k.stress" unit="/5" [delta]="k.dStress" deltaUnit="" [deltaLabel]="k.compare" [higherIsBetter]="false" />
+    </section>
+  } @else {
+    <p class="card supportive-empty">Only {{ k.count }} check-ins so far in this range. Averages appear once at least 3 people have checked in.</p>
+  }
+
+  <section class="grid12">
+    <div class="card c8">
+      <div class="card-head"><h2>Weekly trend</h2><span class="muted small">Team averages, last 6 weeks</span></div>
+      <app-chart [options]="trend()" [height]="300" />
+    </div>
+
+    <div class="card c4 who5">
+      <div class="card-head">
+        <h2>WHO-5 wellbeing <app-info-tip [text]="tips.who5" /></h2>
+      </div>
+      @let w = who5();
+      <app-chart [options]="who5Gauge()" [height]="240" />
+      <p class="muted small center">
+        Team score, week of {{ weekLabel(w.week) }}
+        @if (w.delta !== null) {
+          · {{ w.delta >= 0 ? '+' : '' }}{{ w.delta }} vs the week before
+        }
+      </p>
+      <p class="supportive">
+        @if ((w.now ?? 0) >= 50) {
+          The team is in a healthy range. Keep protecting focus time.
+        } @else {
+          The team could use some breathing room. A lighter sprint or a no-meeting day can help.
+        }
+      </p>
+    </div>
+
+    <div class="card c6">
+      <div class="card-head">
+        <h2>Burnout signals <app-info-tip [text]="tips.maslach" /></h2>
+        <span class="muted small">0–100, lower is better</span>
+      </div>
+      <app-chart [options]="maslach()" [height]="220" />
+    </div>
+
+    <div class="card c6">
+      <div class="card-head">
+        <h2>Flow hours <app-info-tip [text]="tips.flow" /></h2>
+        <span class="muted small">High focus with challenge matching skill</span>
+      </div>
+      <app-chart [options]="flow()" [height]="220" />
+    </div>
+  </section>
+
+  <p class="disclaimer foot">Wellbeing tool, not medical advice. Everything here comes from people's own check-ins and is shown only as team averages.</p>
+</div>

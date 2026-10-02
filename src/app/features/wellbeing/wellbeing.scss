@@ -1,0 +1,27 @@
+.kpis {
+  margin-bottom: var(--s3);
+}
+
+.supportive-empty {
+  margin: 0 0 var(--s3);
+  color: var(--pulse-muted);
+}
+
+.who5 {
+  display: grid;
+  align-content: start;
+
+  .center {
+    text-align: center;
+    margin: 0 0 var(--s2);
+  }
+
+  .supportive {
+    margin: 0;
+  }
+}
+
+.foot {
+  margin-top: var(--s3);
+  text-align: center;
+}
