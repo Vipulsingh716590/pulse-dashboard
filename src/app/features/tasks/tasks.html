@@ -1,0 +1,109 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1>Daily signal board</h1>
+      <p>{{ filter.label() }} · {{ rows().length }} tasks{{ selected() ? ' · ' + statusLabels[selected()!] : '' }}</p>
+    </div>
+  </div>
+
+  <section class="card rings" aria-label="Task status">
+    @for (r of rings(); track r.status) {
+      <button
+        type="button"
+        class="ring"
+        [class.active]="selected() === r.status"
+        [class.dim]="selected() && selected() !== r.status"
+        [style.--c]="r.color"
+        [style.--p]="r.pct"
+        (click)="toggle(r.status)"
+        [attr.aria-pressed]="selected() === r.status"
+      >
+        <span class="donut-wrap">
+          <span class="donut"></span>
+          <span class="n">{{ r.n }}</span>
+        </span>
+        <span class="label">
+          @if (r.status === 'in-progress') {
+            <span class="live" aria-hidden="true"></span>
+          }
+          {{ r.label }}
+        </span>
+      </button>
+    }
+  </section>
+
+  <section class="grid12 main">
+    <div class="card c8">
+      <div class="card-head">
+        <h2>Tasks</h2>
+        @if (selected()) {
+          <button mat-button (click)="selected.set(null)">Show all statuses</button>
+        }
+      </div>
+      <div class="list" role="table" aria-label="Tasks">
+        <div class="row head" role="row">
+          <span role="columnheader"><span class="sr">Owner</span></span>
+          <span role="columnheader">Task</span>
+          <span role="columnheader">Skill</span>
+          <span role="columnheader">Done</span>
+          <span role="columnheader">Status</span>
+          <span role="columnheader"><span class="sr">Action</span></span>
+        </div>
+        @for (t of visible(); track t.id) {
+          @let owner = store.member(t.ownerId);
+          <div class="row" role="row">
+            <span class="owner" role="cell" [attr.title]="owner?.name">
+              <span class="avatar" [style.background]="owner?.avatarColor">{{ owner?.initials }}</span>
+            </span>
+            <span class="task" role="cell">
+              <strong>
+                @if (live(t)) {
+                  <span class="live" aria-label="Live"></span>
+                }
+                {{ t.title }}
+              </strong>
+              <span class="muted small">
+                {{ owner?.name }} · {{ t.project }} · {{ dayLabel(t.date) }}
+                @if (t.reassignedFrom) {
+                  · moved from {{ store.member(t.reassignedFrom)?.shortName }}
+                }
+                @if (t.blocked) {
+                  · 🟡 {{ t.blockedReason }}
+                }
+              </span>
+            </span>
+            <span role="cell"><span class="pill" [class]="t.type">{{ typeLabels[t.type] }}</span></span>
+            <span class="pct" role="cell">
+              <span class="bar"><span [style.width.%]="t.percentDone"></span></span>
+              <span class="small">{{ t.percentDone }}%</span>
+            </span>
+            <span class="status" role="cell" [class]="t.status">{{ statusLabels[t.status] }}</span>
+            <span class="action" role="cell">
+              @if (canAccept(t)) {
+                <button mat-flat-button class="big-action" (click)="accept(t)">Accept</button>
+              }
+            </span>
+          </div>
+        } @empty {
+          <p class="empty">No tasks here.</p>
+        }
+      </div>
+      @if (rows().length > visible().length) {
+        <button mat-stroked-button class="view-all" (click)="showAll.set(true)">View all {{ rows().length }}</button>
+      }
+    </div>
+
+    <aside class="card c4 sugs">
+      <div class="card-head"><h2>Smart reassignment</h2></div>
+      @for (s of reassignment.suggestions(); track s.key) {
+        <app-reassign-card [suggestion]="s" />
+      } @empty {
+        <p class="muted small">Every open task has an available owner with the right skills.</p>
+      }
+      <p class="muted rule">
+        Suggested when the owner is resting or offline, or their skill in the task's area is below 3/5. The pick is the available
+        person with skill 4/5 or more and the lowest load.
+      </p>
+    </aside>
+  </section>
+</div>
