@@ -1,0 +1,181 @@
+@if (!me()) {
+  <div class="page">
+    <div class="card pick">
+      <span class="material-symbols-outlined" aria-hidden="true">person_search</span>
+      <h2>My Space belongs to each developer</h2>
+      <p class="muted">Pick whose space to open. This is the same as changing "Viewing as" in the top bar.</p>
+      <div class="people">
+        @for (d of store.developers(); track d.id) {
+          <button mat-stroked-button class="big-action" (click)="viewingAs.set(d.id)">{{ d.name }}</button>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  @let p = me()!;
+  <div class="page">
+    <div class="page-head">
+      <div class="hello">
+        <span class="avatar" [style.background]="p.avatarColor">{{ p.initials }}</span>
+        <div>
+          <h1>Hi, {{ p.name }}</h1>
+          <p>{{ date }} · <app-status-dot [status]="status()" [label]="true" /></p>
+        </div>
+      </div>
+    </div>
+
+    <section class="grid12">
+      <!-- Check-in comes first: how you are matters before what you do -->
+      <div class="card c5">
+        <div class="card-head">
+          <h2>Daily check-in</h2>
+          <span class="muted small">About 1 minute</span>
+        </div>
+        @if (lastResult(); as r) {
+          <div class="result" [class.unwell]="r.unwell">
+            @if (r.unwell) {
+              <strong>Rest well, {{ p.shortName }}.</strong>
+              Your status is now 🔵 Resting and your manager knows you need rest today.
+              @if (r.suggestions) {
+                {{ r.suggestions }} of your open task{{ r.suggestions > 1 ? 's have' : ' has' }} a cover suggestion waiting for approval.
+              }
+            } @else {
+              <strong>Thanks, check-in saved.</strong> Have a good day.
+            }
+          </div>
+        }
+        @if (checkIn() && !editing()) {
+          @let c = checkIn()!;
+          <div class="summary">
+            <span class="emoji" aria-hidden="true">{{ unwell() ? '🤒' : moodEmoji(c.mood) }}</span>
+            <dl>
+              <div><dt>Feeling</dt><dd>{{ unwell() ? 'Unwell' : 'Well' }}</dd></div>
+              @if (c.temperatureF) {
+                <div><dt>Temperature</dt><dd>{{ c.temperatureF }}°F ({{ fToC(c.temperatureF) }}°C)</dd></div>
+              }
+              <div><dt>Sleep</dt><dd>{{ c.sleepHours }}h</dd></div>
+              <div><dt>Energy</dt><dd>{{ c.energy }}/5</dd></div>
+              <div><dt>Focus</dt><dd>{{ c.focus }}/5</dd></div>
+              <div><dt>Stress</dt><dd>{{ c.stress }}/5</dd></div>
+            </dl>
+            @if (unwell()) {
+              <p class="muted small">Shared with your manager: {{ c.shareDetails ? 'your details' : '"unwell – needs rest" only' }}.</p>
+            }
+            <button mat-stroked-button (click)="edit()">Edit check-in</button>
+          </div>
+        } @else {
+          <app-check-in-form [personId]="p.id" (saved)="onSaved($event)" />
+        }
+      </div>
+
+      <div class="card c7">
+        <div class="card-head">
+          <h2>My tasks today</h2>
+          <span class="muted small" [class.over]="load() > 100">{{ load() }}% of my capacity</span>
+        </div>
+        <ul class="tasks">
+          @for (t of tasks(); track t.id) {
+            <li>
+              <div class="top">
+                <strong>{{ t.title }}</strong>
+                <span class="pill" [class]="t.type">{{ typeLabels[t.type] }}</span>
+              </div>
+              <div class="meta muted small">
+                {{ t.project }} · {{ statusLabels[t.status] }}
+                @if (t.reassignedFrom) {
+                  · moved from {{ store.member(t.reassignedFrom)?.name }}
+                }
+                @if (t.blocked) {
+                  · 🟡 {{ t.blockedReason }}
+                }
+              </div>
+              <div class="bottom">
+                <div class="bar"><span [style.width.%]="t.percentDone"></span></div>
+                <span class="small">{{ t.percentDone }}%</span>
+                @if (t.percentDone < 100) {
+                  <button mat-stroked-button (click)="progress(t)">+25%</button>
+                } @else if (t.status === 'completed') {
+                  <button mat-flat-button (click)="report(t)">Report to manager</button>
+                }
+              </div>
+            </li>
+          } @empty {
+            <li class="muted">Nothing planned for today.</li>
+          }
+        </ul>
+      </div>
+
+      <div class="card c7">
+        <div class="card-head"><h2>My last 7 days</h2></div>
+        <app-seven-day-table [personId]="p.id" [ownView]="true" />
+      </div>
+
+      <div class="card c5">
+        <div class="card-head"><h2>My skills</h2></div>
+        <app-skill-radar [skills]="p.skills" [height]="240" />
+        <h3 class="sub">One small step</h3>
+        <ul class="growth">
+          @for (g of growth(); track g.area) {
+            <li>
+              <strong>{{ g.label }} · {{ g.score }}/5</strong>
+              <span>{{ g.action }}</span>
+            </li>
+          } @empty {
+            <li class="muted">Every area is at 4/5 or above. Consider mentoring someone this week.</li>
+          }
+        </ul>
+      </div>
+
+      <div class="card c6">
+        <div class="card-head">
+          <h2>Weekly reflection <app-info-tip [text]="tips.stoic" /></h2>
+        </div>
+        <form class="reflect" (submit)="$event.preventDefault(); saveReflection()">
+          <label>
+            <span>What went well this week?</span>
+            <textarea rows="2" [value]="wentWell()" (input)="wentWell.set($any($event.target).value)"></textarea>
+          </label>
+          <label>
+            <span>What was in my control?</span>
+            <textarea rows="2" [value]="inMyControl()" (input)="inMyControl.set($any($event.target).value)"></textarea>
+          </label>
+          <label>
+            <span>One thing to improve next week</span>
+            <textarea rows="2" [value]="improve()" (input)="improve.set($any($event.target).value)"></textarea>
+          </label>
+          <div class="row">
+            <button mat-flat-button type="submit" [disabled]="!wentWell().trim() && !inMyControl().trim() && !improve().trim()">Save reflection</button>
+            @if (reflectionSaved()) {
+              <span class="muted small">Saved. Only you can see this.</span>
+            }
+          </div>
+        </form>
+        @if (reflection(); as r) {
+          @if (!reflectionSaved() && r.improve) {
+            <p class="last muted small">Week of {{ formatDay(r.weekStart) }}, you planned: "{{ r.improve }}"</p>
+          }
+        }
+      </div>
+
+      <div class="card c6">
+        <div class="card-head">
+          <h2>My next-week outlook <app-info-tip [text]="tips.outlook" /></h2>
+          @if (outlook(); as o) {
+            <span class="risk" [class]="o.level">{{ o.level }} risk</span>
+          }
+        </div>
+        @if (outlook(); as o) {
+          <ul class="reasons">
+            @for (r of o.reasons; track $index) {
+              <li>{{ r }}</li>
+            }
+          </ul>
+          @if (o.level !== 'Low') {
+            <p class="supportive">A lighter plan is a strength, not a weakness. Talk to your manager about what can move.</p>
+          }
+        }
+        <p class="disclaimer">Wellbeing tool, not medical advice.</p>
+      </div>
+    </section>
+  </div>
+}

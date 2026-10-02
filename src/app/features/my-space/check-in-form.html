@@ -1,0 +1,79 @@
+<form class="form" (submit)="$event.preventDefault(); submit()">
+  <fieldset class="well">
+    <legend>How are you feeling today?</legend>
+    <div class="choice">
+      <button type="button" [class.on]="feelingWell()" (click)="feelingWell.set(true)" [attr.aria-pressed]="feelingWell()">
+        <span aria-hidden="true">🙂</span> Feeling well
+      </button>
+      <button type="button" [class.on]="!feelingWell()" class="unwell" (click)="feelingWell.set(false)" [attr.aria-pressed]="!feelingWell()">
+        <span aria-hidden="true">🤒</span> Unwell
+      </button>
+    </div>
+  </fieldset>
+
+  <label class="temp">
+    <span>Temperature <span class="muted">(optional)</span></span>
+    <span class="input">
+      <input type="number" inputmode="decimal" step="0.1" min="95" max="106" placeholder="98.6" [value]="temperature() ?? ''" (input)="setTemperature($any($event.target).value)" />
+      <span class="unit">°F</span>
+      @if (celsius(); as c) {
+        <span class="muted small">= {{ c }}°C</span>
+      }
+    </span>
+  </label>
+
+  @if (unwell()) {
+    <div class="unwell-box">
+      <p>
+        @if (fever()) {
+          That's a fever (100°F / 37.8°C or more).
+        }
+        Please rest. When you save, your status becomes 🔵 Resting and your manager is told you need rest today.
+      </p>
+      <label class="field">
+        <span>Symptoms <span class="muted">(optional)</span></span>
+        <input type="text" [value]="symptoms()" (input)="symptoms.set($any($event.target).value)" placeholder="e.g. fever, headache" />
+      </label>
+      <mat-checkbox [checked]="shareDetails()" (change)="shareDetails.set($event.checked)">Share details with my manager</mat-checkbox>
+      <span class="muted small">If unticked, your manager only sees "unwell – needs rest".</span>
+    </div>
+  }
+
+  <div class="sliders">
+    <label>
+      <span>Sleep last night <strong>{{ sleep() }}h</strong></span>
+      <mat-slider min="3" max="10" step="0.5" discrete><input matSliderThumb [value]="sleep()" (valueChange)="sleep.set($event)" aria-label="Sleep hours" /></mat-slider>
+    </label>
+    <label>
+      <span>Energy <strong>{{ energy() }}/5</strong></span>
+      <mat-slider min="1" max="5" step="1" discrete><input matSliderThumb [value]="energy()" (valueChange)="energy.set($event)" aria-label="Energy" /></mat-slider>
+    </label>
+    <label>
+      <span>Focus <strong>{{ focus() }}/5</strong></span>
+      <mat-slider min="1" max="5" step="1" discrete><input matSliderThumb [value]="focus()" (valueChange)="focus.set($event)" aria-label="Focus" /></mat-slider>
+    </label>
+    <label>
+      <span>Stress <strong>{{ stress() }}/5</strong></span>
+      <mat-slider min="1" max="5" step="1" discrete><input matSliderThumb [value]="stress()" (valueChange)="stress.set($event)" aria-label="Stress" /></mat-slider>
+    </label>
+  </div>
+
+  <fieldset>
+    <legend>Mood</legend>
+    <div class="moods">
+      @for (e of moods; track $index) {
+        <button type="button" [class.on]="mood() === $index + 1" (click)="mood.set($index + 1)" [attr.aria-label]="'Mood ' + ($index + 1) + ' of 5'" [attr.aria-pressed]="mood() === $index + 1">
+          {{ e }}
+        </button>
+      }
+    </div>
+  </fieldset>
+
+  <label class="field">
+    <span>Anything on your mind? <span class="muted">(optional, only you see this in My Space)</span></span>
+    <input type="text" [value]="note()" (input)="note.set($any($event.target).value)" placeholder="One line is plenty" />
+  </label>
+
+  <button mat-flat-button class="big-action submit" type="submit">Save check-in</button>
+  <p class="disclaimer">Wellbeing tool, not medical advice.</p>
+</form>

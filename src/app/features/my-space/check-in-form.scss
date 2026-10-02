@@ -1,0 +1,125 @@
+.form {
+  display: grid;
+  gap: var(--s2);
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+}
+
+legend,
+label > span:first-child {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.choice,
+.moods {
+  display: flex;
+  gap: var(--s1);
+
+  button {
+    flex: 1;
+    min-height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--pulse-border);
+    background: var(--pulse-surface);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+
+    &.on {
+      border-color: var(--pulse-accent);
+      background: var(--pulse-accent-soft);
+      font-weight: 600;
+    }
+
+    &.unwell.on {
+      border-color: var(--status-resting);
+      background: color-mix(in srgb, var(--status-resting) 14%, transparent);
+    }
+  }
+}
+
+.moods button {
+  font-size: 1.4rem;
+}
+
+.temp,
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+input[type='number'],
+input[type='text'] {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pulse-border);
+  background: var(--pulse-surface);
+  color: inherit;
+  box-sizing: border-box;
+  width: 100%;
+
+  &:focus {
+    outline: 2px solid var(--pulse-accent);
+    outline-offset: -1px;
+  }
+}
+
+.temp .input {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+
+  input {
+    width: 110px;
+  }
+}
+
+.unwell-box {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s2);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--status-resting) 10%, var(--pulse-surface));
+  border: 1px solid color-mix(in srgb, var(--status-resting) 35%, var(--pulse-border));
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+}
+
+.sliders {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px var(--s3);
+
+  label {
+    display: grid;
+  }
+
+  mat-slider {
+    margin: 0 6px;
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.submit {
+  justify-self: start;
+}
+
+.disclaimer {
+  margin: 0;
+}
