@@ -1,0 +1,81 @@
+/* ---------- Page 1: hero ---------- */
+.hero {
+  --brand-sky: light-dark(#eaf1ff, #121a33);
+  --brand-mist: light-dark(#f4f1ff, #17142b);
+  background:
+    radial-gradient(60% 70% at 15% 30%, color-mix(in srgb, var(--brand-blue) 16%, transparent), transparent 70%),
+    radial-gradient(50% 60% at 90% 10%, color-mix(in srgb, var(--pulse-accent) 14%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--brand-sky), var(--brand-mist) 70%, var(--pulse-bg));
+  border-bottom: 1px solid var(--pulse-border);
+}
+
+.hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--s4) var(--s3);
+  display: grid;
+  gap: var(--s3);
+  justify-items: center;
+}
+
+.hero-copy {
+  text-align: center;
+
+  .eyebrow {
+    margin: 0 0 var(--s1);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-blue);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    text-wrap: balance;
+    max-width: 24ch;
+    margin: 0 auto;
+  }
+}
+
+.hero-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: var(--s4);
+  align-items: center;
+}
+
+.coin-col {
+  display: grid;
+  place-items: center;
+}
+
+.see-more {
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-inner {
+    padding: var(--s3) var(--s2);
+  }
+}
+
+/* ---------- Page 2: comparison ---------- */
+#comparison {
+  scroll-margin-top: 72px;
+}
+
+.section-title {
+  font-size: 1.4rem;
+}
+
+.kpis {
+  margin-bottom: var(--s3);
+}

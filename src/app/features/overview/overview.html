@@ -1,0 +1,89 @@
+<!-- Page 1: hero. One focal point: the coin. -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">MobiKwik · Web Team</p>
+      <h1>{{ overallContribution() }}% of MobiKwik's impact, from a team of {{ kpis().size }}.</h1>
+    </div>
+    <div class="hero-grid">
+      <div class="coin-col">
+        <app-coin-flip [value]="overallContribution()" (firstFlip)="revealed.set(true)" />
+      </div>
+      <div class="org-col">
+        <app-org-chart [revealed]="revealed()" [canOpen]="viewingAs.isManager()" (open)="selectedId.set($event)" />
+      </div>
+    </div>
+    <button mat-stroked-button class="see-more" (click)="scrollToComparison()">See full comparison ↓</button>
+  </div>
+</section>
+
+<!-- Page 2: comparison -->
+<div class="page" id="comparison">
+  <div class="page-head">
+    <div>
+      <h2 class="section-title">Web Team vs other MobiKwik teams</h2>
+      <p>{{ drill.selected().label }}</p>
+    </div>
+    <app-drilldown-nav [drill]="drill" [showChips]="false" />
+  </div>
+
+  @let k = kpis();
+  <section class="grid12 kpis">
+    <app-kpi-card
+      class="c3"
+      label="Web Team contribution"
+      [value]="k.contribution"
+      unit="%"
+      [accent]="true"
+      [delta]="k.contributionDelta"
+      deltaUnit=" pts"
+      [deltaLabel]="compareLabel()"
+      [info]="'Share of company-wide business impact points. Rank #' + k.rank + ' of ' + k.teamCount + ' teams.'"
+    />
+    <app-kpi-card class="c3" label="Tasks delivered" [value]="k.delivered" [delta]="k.deliveredDelta" [deltaLabel]="compareLabel()" />
+    <app-kpi-card class="c3" label="Delivered on time" [value]="k.onTime" unit="%" [delta]="k.onTimeDelta" deltaUnit=" pts" [deltaLabel]="compareLabel()" />
+    <app-kpi-card class="c3" label="Bugs fixed" [value]="k.bugs" [delta]="k.bugsDelta" [deltaLabel]="compareLabel()" />
+  </section>
+
+  <section class="grid12">
+    <div class="card c8">
+      <div class="card-head">
+        <h2>6-month trend <span class="muted small">· by {{ drill.grain() }}</span></h2>
+        <span class="muted small">{{ grainHint() }}</span>
+      </div>
+      <app-chart [options]="line()" [height]="320" (pointSelect)="drill.drillInto($event)" />
+    </div>
+
+    <div class="card c4">
+      <div class="card-head">
+        <h2>
+          Contribution share
+          <app-info-tip text="Business impact points: Web Team vs the six other MobiKwik teams combined." />
+        </h2>
+      </div>
+      <app-chart [options]="donut()" [height]="320" />
+    </div>
+
+    <div class="card c8">
+      <div class="card-head">
+        <h2>
+          Team by team
+          <app-info-tip text="Each metric is indexed so the top team = 100, so different units fit one chart. Hover to see the real totals." />
+        </h2>
+      </div>
+      <app-chart [options]="groupedBar()" [height]="340" />
+    </div>
+
+    <div class="card c4">
+      <div class="card-head">
+        <h2>
+          Strengths
+          <app-info-tip text="Quarterly peer and stakeholder scoring (0–100), compared with the average of the other six teams." />
+        </h2>
+      </div>
+      <app-chart [options]="radar()" [height]="340" />
+    </div>
+  </section>
+</div>
+
+<app-person-drawer [personId]="selectedId()" (closed)="selectedId.set(null)" />

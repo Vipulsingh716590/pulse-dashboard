@@ -1,0 +1,47 @@
+<div class="stage" [class.reduced]="reduced" [class.tails-up]="showingTails()">
+  <button
+    type="button"
+    class="scene"
+    (click)="flipNow()"
+    [attr.aria-label]="showingTails() ? 'Showing ' + value() + '% contribution. Click to flip.' : 'Showing MobiKwik logo. Click to flip.'"
+  >
+    <div class="coin" #coin>
+      <!-- edge layers give the coin real thickness when it turns -->
+      @for (z of [-5, -3, -1, 1, 3, 5]; track z) {
+        <span class="edge" [style.transform]="'translateZ(' + z + 'px)'"></span>
+      }
+
+      <div class="face heads">
+        <div class="inner">
+          @if (!logoFailed()) {
+            <img [src]="logoSrc()" alt="MobiKwik" (error)="logoFailed.set(true)" />
+          } @else {
+            <span class="logo-missing">Logo</span>
+          }
+        </div>
+        <span class="shine"></span>
+      </div>
+
+      <div class="face tails">
+        <div class="inner">
+          <svg viewBox="0 0 180 180" class="ring" aria-hidden="true">
+            <circle cx="90" cy="90" [attr.r]="ringR" class="track" />
+            <circle
+              cx="90"
+              cy="90"
+              [attr.r]="ringR"
+              class="fill"
+              [attr.stroke-dasharray]="ringLength"
+              [attr.stroke-dashoffset]="ringOffset()"
+            />
+          </svg>
+          <span class="pct">{{ shown().toFixed(0) }}<small>%</small></span>
+        </div>
+        <span class="shine"></span>
+      </div>
+    </div>
+  </button>
+  <span class="floor" #floor aria-hidden="true"></span>
+  <p class="caption" [class.visible]="showingTails()">{{ caption() }}</p>
+  <p class="hint">Hover to pause · click to flip</p>
+</div>

@@ -1,0 +1,236 @@
+:host {
+  display: block;
+  --line: color-mix(in srgb, var(--pulse-accent) 35%, var(--pulse-border));
+}
+
+.chart {
+  display: grid;
+  justify-items: center;
+}
+
+.level {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  padding-top: 22px;
+
+  /* vertical connector from the card above */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 22px;
+    border-left: 2px solid var(--line);
+  }
+
+  &.top {
+    padding-top: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 300px);
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--pulse-surface);
+  border: 1px solid var(--pulse-border);
+  box-shadow: var(--pulse-shadow);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+
+  /* fade in one by one, top to bottom */
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease,
+    border-color 0.2s ease;
+  transition-delay: calc(var(--i, 0) * 110ms);
+
+  &.manager {
+    border-color: color-mix(in srgb, #2f6fed 40%, var(--pulse-border));
+  }
+
+  &.lead {
+    border-color: color-mix(in srgb, var(--pulse-accent) 45%, var(--pulse-border));
+  }
+}
+
+button.node {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--pulse-accent);
+    outline: none;
+  }
+}
+
+.revealed .node {
+  opacity: 1;
+  transform: none;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.who {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+
+  strong {
+    font-size: 0.9rem;
+  }
+
+  span {
+    font-size: 0.76rem;
+    color: var(--pulse-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+app-status-dot {
+  flex: none;
+}
+
+/* Members: two columns hanging from a horizontal bar under the lead */
+.members {
+  list-style: none;
+  margin: 0;
+  padding: 22px 0 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  position: relative;
+
+  /* stem from the lead down to the bar */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 11px;
+    border-left: 2px solid var(--line);
+  }
+
+  /* spine running down the middle between the two columns */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 11px;
+    bottom: 30px; /* stop at the last row's centre */
+    left: 50%;
+    border-left: 2px solid var(--line);
+  }
+
+  li {
+    position: relative;
+    display: flex;
+  }
+
+  /* short branch from the spine to each card */
+  li::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    border-top: 2px solid var(--line);
+  }
+
+  li:nth-child(odd) {
+    justify-content: flex-end;
+
+    &::before {
+      right: -8px;
+    }
+  }
+
+  li:nth-child(even)::before {
+    left: -8px;
+  }
+
+  .node {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+.summary {
+  margin: 18px 0 0;
+  font-size: 0.88rem;
+  color: var(--pulse-muted);
+  text-align: center;
+
+  strong {
+    color: var(--pulse-text);
+  }
+}
+
+@media (max-width: 520px) {
+  /* one column with the spine on the left */
+  .members {
+    grid-template-columns: 1fr;
+    padding-left: 18px;
+
+    /* elbow from the lead (centre) across to the left spine */
+    &::before {
+      left: 6px;
+      right: 50%;
+      height: 11px;
+      border-left: 0;
+      border-right: 2px solid var(--line);
+      border-bottom: 2px solid var(--line);
+    }
+
+    &::after {
+      left: 6px;
+      top: 11px;
+    }
+
+    li::before,
+    li:nth-child(odd)::before,
+    li:nth-child(even)::before {
+      left: -12px;
+      right: auto;
+      width: 12px;
+    }
+
+    li:nth-child(odd) {
+      justify-content: flex-start;
+    }
+
+    .node {
+      max-width: none;
+    }
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node {
+    transition: none;
+  }
+}

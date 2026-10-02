@@ -1,0 +1,54 @@
+<div class="chart" [class.revealed]="revealed()">
+  @if (store.manager(); as m) {
+    <div class="level top">
+      <div class="node manager" style="--i: 0">
+        <span class="avatar" [style.background]="m.avatarColor">{{ m.initials }}</span>
+        <div class="who">
+          <strong>{{ m.name }}</strong>
+          <span>{{ m.position }}</span>
+        </div>
+        <app-status-dot status="working" />
+      </div>
+    </div>
+  }
+
+  @if (store.lead(); as lead) {
+    <div class="level">
+      <ng-container *ngTemplateOutlet="card; context: { $implicit: lead, i: 1, lead: true }" />
+    </div>
+  }
+
+  <ul class="members">
+    @for (p of store.developers(); track p.id; let i = $index) {
+      <li>
+        <ng-container *ngTemplateOutlet="card; context: { $implicit: p, i: i + 2, lead: false }" />
+      </li>
+    }
+  </ul>
+
+  @let s = summary();
+  <p class="summary">
+    <strong>{{ s.developers }}</strong> developers • <strong>{{ s.projects }}</strong> projects live • <strong>{{ s.done }}</strong> tasks done today
+  </p>
+</div>
+
+<ng-template #card let-p let-i="i" let-lead="lead">
+  @if (canOpen()) {
+    <button type="button" class="node" [class.lead]="lead" [style.--i]="i" (click)="select(p)" [attr.aria-label]="'Open ' + p.name">
+      <ng-container *ngTemplateOutlet="body; context: { $implicit: p }" />
+    </button>
+  } @else {
+    <div class="node" [class.lead]="lead" [style.--i]="i">
+      <ng-container *ngTemplateOutlet="body; context: { $implicit: p }" />
+    </div>
+  }
+</ng-template>
+
+<ng-template #body let-p>
+  <span class="avatar" [style.background]="p.avatarColor">{{ p.initials }}</span>
+  <div class="who">
+    <strong>{{ p.name }}</strong>
+    <span>{{ p.position }}</span>
+  </div>
+  <app-status-dot [status]="store.statusOf(p.id)" />
+</ng-template>
