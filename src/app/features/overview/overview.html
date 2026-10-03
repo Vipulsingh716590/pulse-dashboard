@@ -63,26 +63,6 @@
       </div>
       <app-chart [options]="donut()" [height]="320" />
     </div>
-
-    <div class="card c8">
-      <div class="card-head">
-        <h2>
-          Team by team
-          <app-info-tip text="Each metric is indexed so the top team = 100, so different units fit one chart. Hover to see the real totals." />
-        </h2>
-      </div>
-      <app-chart [options]="groupedBar()" [height]="340" />
-    </div>
-
-    <div class="card c4">
-      <div class="card-head">
-        <h2>
-          Strengths
-          <app-info-tip text="Quarterly peer and stakeholder scoring (0–100), compared with the average of the other six teams." />
-        </h2>
-      </div>
-      <app-chart [options]="radar()" [height]="340" />
-    </div>
   </section>
 </div>
 

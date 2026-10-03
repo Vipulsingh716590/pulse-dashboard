@@ -128,54 +128,6 @@ export class Overview {
     };
   });
 
-  protected readonly groupedBar = computed<ApexOptions>(() => {
-    const totals = this.totals();
-    const teams = this.teams();
-    const metrics = [
-      { key: 'tasksDelivered', label: 'Tasks delivered' },
-      { key: 'bugsFixed', label: 'Bugs fixed' },
-      { key: 'featuresShipped', label: 'Features shipped' },
-      { key: 'impactScore', label: 'Business impact' },
-    ] as const;
-    // Each metric is indexed so the top team = 100; tooltips show the real numbers.
-    const max = metrics.map((m) => Math.max(1, ...teams.map((t) => totals.get(t.id)?.[m.key] ?? 0)));
-    const raw = teams.map((t) => metrics.map((m) => totals.get(t.id)?.[m.key] ?? 0));
-    return {
-      chart: { type: 'bar' },
-      series: teams.map((t, i) => ({ name: t.name, data: raw[i].map((v, j) => Math.round((v / max[j]) * 100)) })),
-      colors: teams.map((t) => t.color),
-      xaxis: { categories: metrics.map((m) => m.label) },
-      yaxis: { max: 100, labels: { formatter: (v: number) => `${Math.round(v)}` }, title: { text: 'Index (top team = 100)' } },
-      plotOptions: { bar: { columnWidth: '78%', borderRadius: 3 } },
-      legend: { position: 'bottom' },
-      tooltip: {
-        shared: false,
-        y: { formatter: (_v: number, o?: { seriesIndex: number; dataPointIndex: number }) => raw[o?.seriesIndex ?? 0][o?.dataPointIndex ?? 0].toLocaleString('en-IN') },
-      },
-    };
-  });
-
-  protected readonly radar = computed<ApexOptions>(() => {
-    const teams = this.teams();
-    const web = teams.find((t) => t.isWebTeam);
-    const others = otherTeams(teams);
-    const axes = ['frontend', 'backend', 'speed', 'quality', 'collaboration', 'innovation'] as const;
-    return {
-      chart: { type: 'radar' },
-      series: [
-        { name: 'Web Team', data: axes.map((a) => web?.strengths[a] ?? 0) },
-        { name: 'Other teams (avg)', data: axes.map((a) => Math.round(average(others.map((t) => t.strengths[a])))) },
-      ],
-      labels: ['Frontend', 'Backend', 'Speed', 'Quality', 'Collaboration', 'Innovation'],
-      colors: [ACCENT, OTHERS],
-      stroke: { width: 2 },
-      fill: { opacity: [0.25, 0.08] },
-      markers: { size: 3 },
-      yaxis: { show: false, max: 100 },
-      legend: { position: 'bottom' },
-    };
-  });
-
   /** Web vs average other team, per working day, for each point the drill-down shows. */
   private readonly trend = computed(() => {
     const metrics = this.store.metrics();
