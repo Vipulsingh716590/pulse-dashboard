@@ -1,6 +1,0 @@
-<!-- Placeholder. Replace this file with the official MobiKwik logo (same name). -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <circle cx="100" cy="100" r="92" fill="#ffffff" stroke="#c4cbe0" stroke-width="4" stroke-dasharray="10 8"/>
-  <text x="100" y="94" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" font-weight="600" fill="#5b6478">Logo</text>
-  <text x="100" y="122" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#8a92a6">placeholder</text>
-</svg>

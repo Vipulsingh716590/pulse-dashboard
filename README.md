@@ -67,7 +67,7 @@ Data comes from `WEARABLE_PROVIDER` (`src/app/core/services/wearable.service.ts`
 
 ## Logo
 
-`src/assets/brand/mobikwik-logo.svg` is a neutral placeholder. Replace it with the official file under the same name.
+`src/assets/brand/mobikwik-logo.png` is the MobiKwik logo, used in the top bar and on the heads side of the Overview coin (the tails side shows the 50% contribution). To swap it, replace that file under the same name.
 
 ## Folder structure
 

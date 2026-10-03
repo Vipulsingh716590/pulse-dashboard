@@ -26,7 +26,7 @@ export class CoinFlip {
   /** Web Team contribution, 0–100. */
   readonly value = input.required<number>();
   readonly caption = input("Web Team's contribution to MobiKwik");
-  readonly logoSrc = input('assets/brand/mobikwik-logo.svg');
+  readonly logoSrc = input('assets/brand/mobikwik-logo.png');
   /** Emits once, after the first toss lands. */
   readonly firstFlip = output<void>();
 
