@@ -55,7 +55,7 @@ mkdirSync(OUT, { recursive: true });
 
 // ---------- MobiKwik teams (Overview comparison) ----------
 const teams = [
-  { id: 'web', name: 'Web Team', isWebTeam: true, headcount: 7, color: '#6d5dd3',
+  { id: 'web', name: 'Web Team', isWebTeam: true, headcount: 5, color: '#6d5dd3',
     strengths: { frontend: 94, backend: 72, speed: 88, quality: 84, collaboration: 90, innovation: 86 } },
   { id: 'mobile', name: 'Mobile Apps', isWebTeam: false, headcount: 9, color: '#9aa5b8',
     strengths: { frontend: 70, backend: 48, speed: 72, quality: 78, collaboration: 70, innovation: 74 } },

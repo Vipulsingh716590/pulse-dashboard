@@ -1,5 +1,5 @@
 [
-  {"id":"web","name":"Web Team","isWebTeam":true,"headcount":7,"color":"#6d5dd3","strengths":{"frontend":94,"backend":72,"speed":88,"quality":84,"collaboration":90,"innovation":86}},
+  {"id":"web","name":"Web Team","isWebTeam":true,"headcount":5,"color":"#6d5dd3","strengths":{"frontend":94,"backend":72,"speed":88,"quality":84,"collaboration":90,"innovation":86}},
   {"id":"mobile","name":"Mobile Apps","isWebTeam":false,"headcount":9,"color":"#9aa5b8","strengths":{"frontend":70,"backend":48,"speed":72,"quality":78,"collaboration":70,"innovation":74}},
   {"id":"platform","name":"Platform","isWebTeam":false,"headcount":11,"color":"#b4bccb","strengths":{"frontend":30,"backend":92,"speed":64,"quality":82,"collaboration":66,"innovation":70}},
   {"id":"payments","name":"Payments Core","isWebTeam":false,"headcount":8,"color":"#8792a6","strengths":{"frontend":25,"backend":88,"speed":60,"quality":86,"collaboration":64,"innovation":62}},
