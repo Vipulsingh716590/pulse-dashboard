@@ -4,109 +4,346 @@
 }
 
 .person {
+  --tone: var(--pulse-accent);
+  --ring: var(--status-offline);
+  position: relative;
   width: 100%;
   height: 100%;
-  display: grid;
-  align-content: start;
-  gap: var(--s2);
-  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 var(--s3) var(--s2);
   box-sizing: border-box;
+  overflow: hidden;
   text-align: left;
   font: inherit;
   color: inherit;
   cursor: pointer;
   background: var(--pulse-surface);
   border: 1px solid var(--pulse-border);
-  border-radius: var(--pulse-radius);
+  border-radius: 20px;
   box-shadow: var(--pulse-shadow);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 
   &:hover,
   &:focus-visible {
-    border-color: var(--pulse-accent);
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--tone) 45%, var(--pulse-border));
+    box-shadow: 0 2px 4px rgb(20 20 40 / 4%), 0 18px 40px -12px color-mix(in srgb, var(--tone) 40%, transparent);
     outline: none;
+
+    .cover {
+      opacity: 1;
+    }
+
+    .go {
+      transform: translateX(3px);
+      color: var(--tone);
+    }
   }
 
+  &.working { --ring: var(--status-working); }
+  &.blocked { --ring: var(--status-blocked); }
+  &.resting { --ring: var(--status-resting); }
   &.attention {
-    border-color: color-mix(in srgb, var(--status-attention) 45%, var(--pulse-border));
+    --ring: var(--status-attention);
+    border-color: color-mix(in srgb, var(--status-attention) 40%, var(--pulse-border));
   }
+  &.offline .face {
+    filter: grayscale(0.6);
+  }
+}
+
+/* Soft colour band in the person's own colour */
+.cover {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 72px;
+  opacity: 0.85;
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--tone) 38%, transparent), transparent 60%),
+    linear-gradient(135deg, color-mix(in srgb, var(--tone) 22%, transparent), color-mix(in srgb, var(--tone) 4%, transparent));
+  transition: opacity 0.25s ease;
 }
 
 header {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: 32px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  position: relative;
+  width: 64px;
+  height: 64px;
   flex: none;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
+  border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(var(--ring) 0 100%);
+  box-shadow: 0 0 0 4px var(--pulse-surface);
+
+  .face {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 3px solid var(--pulse-surface);
+    box-sizing: border-box;
+  }
+
+  .badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ring);
+    border: 3px solid var(--pulse-surface);
+  }
+}
+
+.pill {
+  margin-bottom: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pulse-surface) 80%, transparent);
+  border: 1px solid var(--pulse-border);
+  backdrop-filter: blur(6px);
 }
 
 .who {
   display: grid;
-  flex: 1;
-  min-width: 0;
+  gap: 2px;
+  margin-top: -2px;
 
-  span {
-    font-size: 0.8rem;
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.08rem;
+    letter-spacing: -0.01em;
+  }
+
+  > span {
+    font-size: 0.82rem;
     color: var(--pulse-muted);
   }
 }
 
-.chev {
-  color: var(--pulse-muted);
+.tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pulse-accent);
+  background: var(--pulse-accent-soft);
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  li {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    color: var(--pulse-text);
+    background: color-mix(in srgb, var(--tone) 12%, var(--pulse-surface-2));
+  }
+
+  b {
+    margin-left: 2px;
+    color: var(--tone);
+    font-weight: 700;
+  }
 }
 
 .health {
   display: grid;
-  gap: 4px;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--pulse-surface-2);
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 46px;
+  align-items: center;
 
-  .line {
+  .note {
+    grid-column: 1 / -1;
     font-size: 0.82rem;
     color: var(--pulse-muted);
-  }
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--pulse-surface-2);
 
+    &.unwell {
+      color: var(--status-resting);
+      background: color-mix(in srgb, var(--status-resting) 12%, var(--pulse-surface));
+      font-weight: 500;
+    }
+  }
 }
 
-.progress {
+.meter {
   display: grid;
   gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--pulse-surface-2);
+  font-size: 0.72rem;
+  color: var(--pulse-muted);
+}
 
-  .row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-  }
+.dots {
+  display: flex;
+  gap: 4px;
 
-  .over {
-    color: var(--status-attention);
-    font-weight: 600;
+  i {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--pulse-muted) 22%, transparent);
+
+    &.energy.on {
+      background: var(--status-working);
+    }
+
+    &.stress.on {
+      background: var(--status-blocked);
+    }
+
+    &.stress.on.high {
+      background: var(--status-attention);
+    }
   }
 }
 
-.now {
+.work {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  padding-top: 12px;
-  border-top: 1px solid var(--pulse-border);
+  gap: var(--s2);
+  padding: 4px 0;
+}
+
+.ring {
+  --p: 0;
+  flex: none;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(closest-side, var(--pulse-surface) 78%, transparent 80% 100%),
+    conic-gradient(var(--tone) calc(var(--p) * 1%), color-mix(in srgb, var(--pulse-muted) 16%, transparent) 0);
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  small {
+    font-size: 0.7rem;
+    color: var(--pulse-muted);
+    font-weight: 500;
+  }
+}
+
+dl {
+  flex: 1;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+
+  dt {
+    font-size: 0.72rem;
+    color: var(--pulse-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+
+    small {
+      font-size: 0.8rem;
+      color: var(--pulse-muted);
+      font-weight: 500;
+    }
+
+    &.over {
+      color: var(--status-attention);
+    }
+  }
+}
+
+.load {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--pulse-muted) 18%, transparent);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--tone);
+
+    &.over {
+      background: var(--status-attention);
+    }
+  }
+}
+
+footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--pulse-border);
+  font-size: 0.84rem;
 
   .task {
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  em {
+    margin-right: 8px;
+    font-style: normal;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pulse-muted);
+  }
+
+  .go {
+    font-size: 20px;
+    color: var(--pulse-muted);
+    transition: transform 0.25s ease, color 0.25s ease;
   }
 }
 
@@ -137,6 +374,15 @@ header {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .person,
+  .go {
+    transition: none;
+  }
+
+  .person:hover {
+    transform: none;
+  }
+
   .sig.live {
     animation: none;
   }

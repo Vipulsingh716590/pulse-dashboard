@@ -1,49 +1,97 @@
 @if (person(); as p) {
-  <button type="button" class="person" [class]="status()" (click)="open.emit(p.id)" [attr.aria-label]="'Open details for ' + p.name">
+  <button
+    type="button"
+    class="person"
+    [class]="status()"
+    [style.--tone]="p.avatarColor"
+    (click)="open.emit(p.id)"
+    [attr.aria-label]="'Open details for ' + p.name"
+  >
+    <div class="cover" aria-hidden="true"></div>
+
     <header>
-      <span class="avatar" [style.background]="p.avatarColor">{{ p.initials }}</span>
-      <div class="who">
-        <strong>{{ p.name }}</strong>
-        <span>{{ p.position }}</span>
-      </div>
-      <span class="chev material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      <span class="avatar">
+        <span class="face" [style.background]="p.avatarColor">{{ p.initials }}</span>
+        <span class="badge" aria-hidden="true"></span>
+      </span>
+      <span class="pill"><app-status-dot [status]="status()" [label]="true" /></span>
     </header>
 
-    <!-- 1. Health and availability come first -->
+    <div class="who">
+      <strong>
+        {{ p.name }}
+        @if (p.role === 'lead') {
+          <span class="tag">Lead</span>
+        }
+      </strong>
+      <span>{{ p.position }}</span>
+    </div>
+
+    @if (strengths().length) {
+      <ul class="chips" aria-label="Strengths">
+        @for (s of strengths(); track s.area) {
+          <li>{{ s.label }} <b>{{ s.score }}</b></li>
+        }
+      </ul>
+    }
+
+    <!-- 1. How they are -->
     <div class="health">
-      <app-status-dot [status]="status()" [label]="true" />
-      <span class="line">{{ health() }}</span>
+      @if (checkIn(); as c) {
+        @if (unwell()) {
+          <span class="note unwell">Unwell, needs rest today</span>
+        } @else {
+          <div class="meter">
+            <span>Energy</span>
+            <span class="dots" [attr.aria-label]="'Energy ' + c.energy + ' of 5'">
+              @for (i of five; track i) {
+                <i [class.on]="i <= c.energy" class="energy"></i>
+              }
+            </span>
+          </div>
+          <div class="meter">
+            <span>Stress</span>
+            <span class="dots" [attr.aria-label]="'Stress ' + c.stress + ' of 5'">
+              @for (i of five; track i) {
+                <i [class.on]="i <= c.stress" [class.high]="c.stress >= 4" class="stress"></i>
+              }
+            </span>
+          </div>
+        }
+      } @else {
+        <span class="note">{{ note() }}</span>
+      }
     </div>
 
     <!-- 2. Today's work -->
     @let t = today();
-    <div class="progress">
-      <div class="row">
-        <span>Today's tasks</span>
-        <strong>{{ t.pct }}%</strong>
-      </div>
-      <div class="bar"><span [style.width.%]="t.pct"></span></div>
-      <div class="row muted small">
-        <span>{{ t.done }} of {{ t.total }} done</span>
-        <span [class.over]="t.load > 100">{{ t.load }}% load</span>
-      </div>
+    <div class="work">
+      <span class="ring" [style.--p]="t.pct" role="img" [attr.aria-label]="t.pct + '% of today done'">
+        <span>{{ t.pct }}<small>%</small></span>
+      </span>
+      <dl>
+        <div>
+          <dt>Tasks</dt>
+          <dd>{{ t.done }}<small>/{{ t.total }}</small></dd>
+        </div>
+        <div>
+          <dt>Load</dt>
+          <dd [class.over]="t.load > 100">{{ t.load }}<small>%</small></dd>
+          <span class="load" aria-hidden="true"><span [style.width.%]="t.load > 100 ? 100 : t.load" [class.over]="t.load > 100"></span></span>
+        </div>
+      </dl>
     </div>
 
-    <!-- 3. What they are on right now -->
-    <div class="now">
+    <!-- 3. Right now -->
+    <footer>
       @if (current(); as task) {
-        @if (task.blocked) {
-          <span class="sig blocked" aria-hidden="true"></span>
-        } @else if (task.status === 'in-progress' && status() !== 'resting') {
-          <span class="sig live" aria-hidden="true"></span>
-        } @else {
-          <span class="sig idle" aria-hidden="true"></span>
-        }
-        <span class="task">{{ task.title }}</span>
+        <span class="sig" [class]="task.blocked ? 'blocked' : task.status === 'in-progress' && status() !== 'resting' ? 'live' : 'idle'" aria-hidden="true"></span>
+        <span class="task"><em>Now</em>{{ task.title }}</span>
       } @else {
         <span class="sig idle" aria-hidden="true"></span>
-        <span class="task muted">No open tasks</span>
+        <span class="task muted"><em>Now</em>No open tasks</span>
       }
-    </div>
+      <span class="go material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+    </footer>
   </button>
 }

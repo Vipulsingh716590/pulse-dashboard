@@ -5,54 +5,106 @@
     <div class="page-head">
       <div>
         <h1>Web Team today</h1>
-        <p>{{ date }}</p>
+        <p>{{ date }} · led by {{ store.lead()?.name }}</p>
       </div>
     </div>
 
     @let s = summary();
     <section class="grid12">
-      <!-- Most important number, top-left -->
-      <div class="card c8 summary">
-        <div class="headline">
-          <span class="big">{{ s.available }}<small> of {{ s.total }}</small></span>
-          <span class="muted">people available today</span>
+      <!-- Hero: who is here today, at a glance -->
+      <div class="card c8 hero">
+        <div class="hero-top">
+          <div class="headline">
+            <span class="eyebrow">Available today</span>
+            <span class="big">{{ s.available }}<small>/{{ s.total }}</small></span>
+          </div>
+          <ul class="stack" aria-label="Team members">
+            @for (m of store.members(); track m.id) {
+              <li [class]="store.statusOf(m.id)" [style.--c]="m.avatarColor" [attr.title]="m.name">
+                <button type="button" (click)="selectedId.set(m.id)" [attr.aria-label]="'Open ' + m.name">{{ m.initials }}</button>
+              </li>
+            }
+          </ul>
         </div>
-        <dl class="stats">
-          <div><dt>Checked in</dt><dd>{{ s.checkedIn }} of {{ s.total }}</dd></div>
-          <div><dt>Tasks done</dt><dd>{{ s.done }} of {{ s.tasks }}</dd></div>
-          <div><dt>Suggestions</dt><dd>{{ reassignment.suggestions().length }}</dd></div>
-        </dl>
+
+        <div class="dist" role="img" [attr.aria-label]="s.distLabel">
+          @for (c of s.counts; track c.status) {
+            @if (c.n) {
+              <span [class]="c.status" [style.flex-grow]="c.n"></span>
+            }
+          }
+        </div>
         <ul class="legend">
           @for (c of s.counts; track c.status) {
             <li [class.zero]="!c.n"><app-status-dot [status]="c.status" [label]="true" [text]="c.label + ' · ' + c.n" /></li>
           }
         </ul>
+
+        <dl class="stats">
+          <div>
+            <span class="ico material-symbols-outlined" aria-hidden="true">how_to_reg</span>
+            <dt>Checked in</dt>
+            <dd>{{ s.checkedIn }}<small> / {{ s.total }}</small></dd>
+          </div>
+          <div>
+            <span class="ico material-symbols-outlined" aria-hidden="true">task_alt</span>
+            <dt>Tasks done</dt>
+            <dd>{{ s.done }}<small> / {{ s.tasks }}</small></dd>
+          </div>
+          <div>
+            <span class="ico material-symbols-outlined" aria-hidden="true">swap_horiz</span>
+            <dt>Suggestions</dt>
+            <dd>{{ reassignment.suggestions().length }}</dd>
+          </div>
+        </dl>
       </div>
 
       <!-- Alerts sit top-right, near the bell -->
       <div class="card c4 alerts">
-        <div class="card-head"><h2>Needs you</h2></div>
+        <div class="card-head">
+          <h2>Needs you</h2>
+          @if (alerts().length) {
+            <span class="count">{{ alerts().length }}</span>
+          }
+        </div>
         <ul>
           @for (a of alerts(); track a.id) {
-            <li>
+            <li [class]="a.status">
               <button type="button" (click)="selectedId.set(a.personId)">
-                <app-status-dot [status]="a.status" />
                 <span class="text">
                   <strong>{{ a.title }}</strong>
                   <span>{{ a.detail }}</span>
                 </span>
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
               </button>
             </li>
           } @empty {
-            <li class="muted">Nothing needs you right now.</li>
+            <li class="calm">
+              <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+              Nothing needs you right now.
+            </li>
           }
         </ul>
       </div>
     </section>
 
+    <div class="people-head">
+      <h2>People <span class="muted">{{ visible().length }}</span></h2>
+      <div class="filters" role="group" aria-label="Filter people by status">
+        <button type="button" [class.on]="filter() === 'all'" (click)="filter.set('all')">All <b>{{ s.total }}</b></button>
+        @for (c of s.counts; track c.status) {
+          @if (c.n) {
+            <button type="button" [class.on]="filter() === c.status" (click)="filter.set(c.status)">
+              <app-status-dot [status]="c.status" /> {{ c.label }} <b>{{ c.n }}</b>
+            </button>
+          }
+        }
+      </div>
+    </div>
+
     <section class="grid12 people" aria-label="People">
-      @for (m of store.members(); track m.id) {
-        <app-person-card class="c4" [personId]="m.id" (open)="selectedId.set($event)" />
+      @for (m of visible(); track m.id; let i = $index) {
+        <app-person-card class="c4" [style.animation-delay.ms]="i * 60" [personId]="m.id" (open)="selectedId.set($event)" />
       }
     </section>
 

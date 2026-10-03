@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TeamStore } from '../../core/services/team-store.service';
-import { isDone, isUnwell } from '../../core/utils/insights';
+import { isDone, isUnwell, strengthsAndGaps } from '../../core/utils/insights';
 import { StatusDot } from '../status-dot/status-dot';
 
 /**
@@ -20,15 +20,17 @@ export class PersonCard {
   readonly personId = input.required<string>();
   readonly open = output<string>();
 
+  protected readonly five = [1, 2, 3, 4, 5];
   protected readonly person = computed(() => this.store.member(this.personId()));
   protected readonly status = computed(() => this.store.statusOf(this.personId()));
+  protected readonly checkIn = computed(() => this.store.todayCheckIn(this.personId()));
+  protected readonly unwell = computed(() => isUnwell(this.checkIn()));
+  protected readonly note = computed(() => this.store.presenceNote(this.personId()) ?? 'Not checked in yet');
 
-  protected readonly health = computed(() => {
-    const c = this.store.todayCheckIn(this.personId());
-    const note = this.store.presenceNote(this.personId());
-    if (!c) return note ?? 'Not checked in yet';
-    if (isUnwell(c)) return 'Unwell – needs rest';
-    return `Feeling well · energy ${c.energy}/5 · stress ${c.stress}/5`;
+  /** Top two skills at 4/5 or higher. */
+  protected readonly strengths = computed(() => {
+    const p = this.person();
+    return p ? strengthsAndGaps(p).strengths.slice(0, 2) : [];
   });
 
   protected readonly today = computed(() => {

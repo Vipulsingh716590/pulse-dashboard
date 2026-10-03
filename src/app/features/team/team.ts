@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Status } from '../../core/models';
 import { NotificationService } from '../../core/services/notification.service';
 import { ReassignmentService } from '../../core/services/reassignment.service';
 import { TeamStore } from '../../core/services/team-store.service';
@@ -27,6 +28,12 @@ export class TeamPage {
   private readonly notifications = inject(NotificationService);
 
   protected readonly selectedId = signal<string | null>(null);
+  protected readonly filter = signal<Status | 'all'>('all');
+
+  protected readonly visible = computed(() => {
+    const f = this.filter();
+    return this.store.members().filter((m) => f === 'all' || this.store.statusOf(m.id) === f);
+  });
   protected readonly date = formatLongDate(MOCK_TODAY);
   protected readonly time = formatTime;
 
@@ -34,13 +41,15 @@ export class TeamPage {
     const members = this.store.members();
     const today = this.store.todayTasks();
     const statuses = members.map((m) => this.store.statusOf(m.id));
+    const counts = (Object.keys(STATUS_META) as Status[]).map((s) => ({ status: s, label: STATUS_META[s].label, n: statuses.filter((x) => x === s).length }));
     return {
       available: members.filter((m) => this.store.isAvailable(m.id)).length,
       total: members.length,
       checkedIn: members.filter((m) => this.store.todayCheckIn(m.id)).length,
       done: today.filter(isDone).length,
       tasks: today.length,
-      counts: (Object.keys(STATUS_META) as (keyof typeof STATUS_META)[]).map((s) => ({ status: s, label: STATUS_META[s].label, n: statuses.filter((x) => x === s).length })),
+      counts,
+      distLabel: counts.filter((c) => c.n).map((c) => `${c.label} ${c.n}`).join(', '),
     };
   });
 
