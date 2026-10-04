@@ -12,11 +12,12 @@ import { InfoTip } from '../../shared/info-tip/info-tip';
 import { StatusDot } from '../../shared/status-dot/status-dot';
 import { CheckInForm } from './check-in-form';
 import { HealthDataPanel } from './health-data/health-data-panel';
+import { SpacePicker } from './space-picker/space-picker';
 
 /** A developer's own space: check-in, tasks, history, growth, reflection and outlook. */
 @Component({
   selector: 'app-my-space',
-  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, InfoTip, SimpleTrend, HealthDataPanel],
+  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, InfoTip, SimpleTrend, HealthDataPanel, SpacePicker],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './my-space.html',
   styleUrl: './my-space.scss',
@@ -34,6 +35,7 @@ export class MySpace {
   protected readonly formatDay = formatDay;
 
   protected readonly me = computed(() => this.store.member(this.viewingAs.viewerId()));
+
   protected readonly status = computed(() => this.store.statusOf(this.viewingAs.viewerId()));
   protected readonly checkIn = computed(() => this.store.todayCheckIn(this.viewingAs.viewerId()));
   protected readonly unwell = computed(() => isUnwell(this.checkIn()));

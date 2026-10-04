@@ -1,0 +1,64 @@
+  <div class="page">
+    <section class="picker">
+      <div class="picker-head">
+        <span class="eyebrow">My Space</span>
+        <h1>Each space is locked to its developer</h1>
+        <p>A developer's space holds their own check-in, tasks and reflection. Only that developer can open it with their PIN.</p>
+      </div>
+
+      <ul class="profiles">
+        @for (d of store.developers(); track d.id; let i = $index) {
+          <li [style.animation-delay.ms]="i * 70">
+            <button type="button" class="profile" [class]="store.statusOf(d.id)" [style.--tone]="d.avatarColor" (click)="askPin(d.id)" [attr.aria-label]="'Unlock ' + d.name + ' space'">
+              <span class="lock material-symbols-outlined" aria-hidden="true">lock</span>
+              <span class="glow" aria-hidden="true"></span>
+              <span class="avatar">
+                <span class="face" [style.background]="d.avatarColor">{{ d.initials }}</span>
+                <span class="badge" aria-hidden="true"></span>
+              </span>
+              <strong>{{ d.name }}</strong>
+              <span class="role">{{ d.position }}</span>
+              <span class="pill"><app-status-dot [status]="store.statusOf(d.id)" [label]="true" /></span>
+              <span class="open"><span class="material-symbols-outlined" aria-hidden="true">key</span> Unlock with PIN</span>
+            </button>
+          </li>
+        }
+      </ul>
+
+      <p class="privacy">
+        <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+        Private by design: a manager sees team averages and alerts, never a developer's own space or watch data.
+      </p>
+    </section>
+
+    @if (unlocking(); as u) {
+      <div class="pin-backdrop" (click)="unlockId.set(null)" aria-hidden="true"></div>
+      <form class="pin-card" role="dialog" aria-modal="true" [attr.aria-label]="'Unlock ' + u.name + ' space'" [style.--tone]="u.avatarColor" (submit)="$event.preventDefault(); unlock()">
+        <span class="face" [style.background]="u.avatarColor">{{ u.initials }}</span>
+        <h2>{{ u.name }}</h2>
+        <p class="muted">Enter your 4-digit PIN to open your space.</p>
+        <input
+          #pinInput
+          class="pin-input"
+          [class.bad]="pinError()"
+          type="password"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="4"
+          placeholder="••••"
+          aria-label="PIN"
+          [value]="pin()"
+          (input)="setPin(pinInput.value)"
+          autofocus
+        />
+        @if (pinError()) {
+          <p class="pin-error" role="alert">Wrong PIN. Only {{ u.name }} can open this space.</p>
+        }
+        <div class="pin-actions">
+          <button mat-stroked-button type="button" (click)="unlockId.set(null)">Cancel</button>
+          <button mat-flat-button type="submit" [disabled]="pin().length < 4">Unlock</button>
+        </div>
+        <p class="demo">Demo PIN: {{ demoPin(u.id) }}</p>
+      </form>
+    }
+  </div>

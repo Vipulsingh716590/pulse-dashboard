@@ -25,7 +25,7 @@ Production build: `npm run build` (output in `dist/pulse-dashboard`).
 | `/team` | Person cards (health first, then today's %, then current task) and a side drawer with 4 levels: today, last 7 days, last 4 weeks, next-week outlook | Manager |
 | `/tasks` | Daily signal board: 6 progress rings, task rows with Accept, smart reassignment | everyone (Accept / Approve for Manager) |
 | `/wellbeing` | Team averages only: feeling well %, energy, focus, stress, WHO-5, Maslach bars, flow hours | everyone |
-| `/my-space` | Health check-in, my tasks, 7-day table, 4-week trend, Stoic reflection, outlook, private **My Health Data** (watch) | the selected developer |
+| `/my-space` | Locked per developer (demo PINs A 1111 … E 5555). Health check-in, my tasks, 7-day table, 4-week trend, Stoic reflection, outlook, private **My Health Data** (watch) | the selected developer |
 
 The top bar's **Today / Week / Month** filter sets the Overview drill-down level and the range on Tasks and Wellbeing.
 

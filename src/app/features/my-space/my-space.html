@@ -1,36 +1,5 @@
 @if (!me()) {
-  <div class="page">
-    <section class="picker">
-      <div class="picker-head">
-        <span class="eyebrow">My Space</span>
-        <h1>Whose space would you like to open?</h1>
-        <p>Each developer has a personal space with their check-in, tasks and weekly reflection. Pick one to see it the way they do.</p>
-      </div>
-
-      <ul class="profiles">
-        @for (d of store.developers(); track d.id; let i = $index) {
-          <li [style.animation-delay.ms]="i * 70">
-            <button type="button" class="profile" [class]="store.statusOf(d.id)" [style.--tone]="d.avatarColor" (click)="viewingAs.set(d.id)" [attr.aria-label]="'Open ' + d.name + ' space'">
-              <span class="glow" aria-hidden="true"></span>
-              <span class="avatar">
-                <span class="face" [style.background]="d.avatarColor">{{ d.initials }}</span>
-                <span class="badge" aria-hidden="true"></span>
-              </span>
-              <strong>{{ d.name }}</strong>
-              <span class="role">{{ d.position }}</span>
-              <span class="pill"><app-status-dot [status]="store.statusOf(d.id)" [label]="true" /></span>
-              <span class="open">Open space <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></span>
-            </button>
-          </li>
-        }
-      </ul>
-
-      <p class="privacy">
-        <span class="material-symbols-outlined" aria-hidden="true">lock</span>
-        Watch health data stays private: only the developer can see it. You can also switch with "Viewing as" in the top bar.
-      </p>
-    </section>
-  </div>
+  <app-space-picker />
 } @else {
   @let p = me()!;
   <div class="page">
