@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { ApexOptions } from 'ng-apexcharts';
 import { FilterService } from '../../core/services/filter.service';
 import { TeamStore } from '../../core/services/team-store.service';
@@ -21,7 +20,7 @@ const OTHERS = '#a3a9b8';
 /** "/": the coin hero first, then how the Web Team compares with the rest of MobiKwik. */
 @Component({
   selector: 'app-overview',
-  imports: [KpiCard, Chart, DrilldownNav, CoinFlip, OrgChart, PersonDrawer, MatButtonModule],
+  imports: [KpiCard, Chart, DrilldownNav, CoinFlip, OrgChart, PersonDrawer],
   templateUrl: './overview.html',
   styleUrl: './overview.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,11 +52,6 @@ export class Overview {
         }
       });
     });
-  }
-
-  scrollToComparison(): void {
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.getElementById('comparison')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }
 
   // ---- Page 2: totals for the selected range and the comparison pair ----
