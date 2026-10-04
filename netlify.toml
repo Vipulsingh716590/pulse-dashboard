@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist/pulse-dashboard/browser"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Angular handles routes like /team in the browser
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
