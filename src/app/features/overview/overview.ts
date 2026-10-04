@@ -8,7 +8,6 @@ import { average, MOCK_TODAY, round } from '../../core/utils/date';
 import { DrillDown, inPeriod } from '../../core/utils/drilldown';
 import { Chart } from '../../shared/charts/chart';
 import { DrilldownNav } from '../../shared/charts/drilldown-nav';
-import { InfoTip } from '../../shared/info-tip/info-tip';
 import { KpiCard } from '../../shared/kpi-card/kpi-card';
 import { PersonDrawer } from '../team/person-drawer/person-drawer';
 import { CoinFlip } from './hero/coin-flip';
@@ -21,7 +20,7 @@ const OTHERS = '#a3a9b8';
 /** "/": the coin hero first, then how the Web Team compares with the rest of MobiKwik. */
 @Component({
   selector: 'app-overview',
-  imports: [KpiCard, Chart, DrilldownNav, InfoTip, CoinFlip, OrgChart, PersonDrawer, MatButtonModule],
+  imports: [KpiCard, Chart, DrilldownNav, CoinFlip, OrgChart, PersonDrawer, MatButtonModule],
   templateUrl: './overview.html',
   styleUrl: './overview.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -100,34 +99,6 @@ export class Overview {
   }
 
   // ---- charts ----
-  protected readonly donut = computed<ApexOptions>(() => {
-    const totals = this.totals();
-    const web = totals.get('web')?.impactScore ?? 0;
-    const others = [...totals.entries()].filter(([id]) => id !== 'web').reduce((s, [, t]) => s + t.impactScore, 0);
-    const pct = Math.round(contributionPct(totals));
-    return {
-      chart: { type: 'donut' },
-      series: [web, others],
-      labels: ['Web Team', 'Other MobiKwik teams (6)'],
-      colors: [ACCENT, OTHERS],
-      legend: { position: 'bottom' },
-      plotOptions: {
-        pie: {
-          expandOnClick: false,
-          donut: {
-            size: '70%',
-            labels: {
-              show: true,
-              value: { fontSize: '22px', fontWeight: 600, formatter: (v: string) => `${Math.round((+v / Math.max(1, web + others)) * 100)}%` },
-              total: { show: true, showAlways: true, label: 'Web Team', fontSize: '13px', color: ACCENT, formatter: () => `${pct}%` },
-            },
-          },
-        },
-      },
-      tooltip: { y: { formatter: (v: number) => `${v.toLocaleString('en-IN')} impact pts` } },
-    };
-  });
-
   /** Web vs average other team, per working day, for each point the drill-down shows. */
   private readonly trend = computed(() => {
     const metrics = this.store.metrics();

@@ -46,22 +46,12 @@
   </section>
 
   <section class="grid12">
-    <div class="card c8">
+    <div class="card c12">
       <div class="card-head">
         <h2>6-month trend <span class="muted small">· by {{ drill.grain() }}</span></h2>
         <span class="muted small">{{ grainHint() }}</span>
       </div>
       <app-chart [options]="line()" [height]="320" (pointSelect)="drill.drillInto($event)" />
-    </div>
-
-    <div class="card c4">
-      <div class="card-head">
-        <h2>
-          Contribution share
-          <app-info-tip text="Business impact points: Web Team vs the six other MobiKwik teams combined." />
-        </h2>
-      </div>
-      <app-chart [options]="donut()" [height]="320" />
     </div>
   </section>
 </div>
