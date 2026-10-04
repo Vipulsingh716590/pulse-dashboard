@@ -4,22 +4,21 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { ReassignmentService } from '../../../core/services/reassignment.service';
 import { TeamStore } from '../../../core/services/team-store.service';
 import { fToC, MOCK_TODAY } from '../../../core/utils/date';
-import { FRAMEWORK_TIPS, isUnwell, personInsights, STATUS_LABELS, strengthsAndGaps } from '../../../core/utils/insights';
+import { FRAMEWORK_TIPS, isUnwell, STATUS_LABELS } from '../../../core/utils/insights';
 import { FocusHeatmap } from '../../../shared/charts/focus-heatmap';
 import { SevenDayTable } from '../../../shared/charts/seven-day-table';
 import { SimpleTrend } from '../../../shared/charts/simple-trend';
-import { SkillRadar } from '../../../shared/charts/skill-radar';
 import { InfoTip } from '../../../shared/info-tip/info-tip';
 import { ReassignCard } from '../../../shared/reassign-card/reassign-card';
 import { StatusDot } from '../../../shared/status-dot/status-dot';
 
 /**
- * Side drawer with progressive depth: Today → last 7 days → 4-week trend → skills →
- * "Understanding this person" → next-week outlook. Each level opens on click.
+ * Side drawer with progressive depth: Today → last 7 days → 4-week trend →
+ * next-week outlook. Each level opens on click.
  */
 @Component({
   selector: 'app-person-drawer',
-  imports: [MatButtonModule, MatExpansionModule, StatusDot, FocusHeatmap, SevenDayTable, SkillRadar, SimpleTrend, InfoTip, ReassignCard],
+  imports: [MatButtonModule, MatExpansionModule, StatusDot, FocusHeatmap, SevenDayTable, SimpleTrend, InfoTip, ReassignCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './person-drawer.html',
   styleUrl: './person-drawer.scss',
@@ -58,14 +57,7 @@ export class PersonDrawer {
     };
   });
 
-  // ---- 4–6 ----
-  protected readonly skills = computed(() => (this.person() ? strengthsAndGaps(this.person()!) : { strengths: [], gaps: [] }));
-  protected readonly insights = computed(() => {
-    const p = this.person();
-    if (!p) return [];
-    const blocked = this.store.tasksToday(p.id).find((t) => t.blocked)?.blockedReason;
-    return personInsights(p, this.checkIns(), this.logs(), this.store.loadOf(p.id), blocked);
-  });
+  // ---- 4 ----
   protected readonly outlook = computed(() => this.store.outlooks().get(this.personId() ?? ''));
 
   protected close(): void {

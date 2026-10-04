@@ -89,39 +89,7 @@
 
         <mat-expansion-panel>
           <mat-expansion-panel-header>
-            <mat-panel-title>4 · Skills</mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-skill-radar [skills]="p.skills" [height]="260" />
-            <div class="chips">
-              @for (s of skills().strengths; track s.area) {
-                <span class="chip strong">{{ s.label }} {{ s.score }}/5</span>
-              }
-              @for (g of skills().gaps; track g.area) {
-                <span class="chip gap">{{ g.label }} {{ g.score }}/5</span>
-              }
-            </div>
-            <p class="muted small">Green = strength (4–5), amber = still growing (1–2).</p>
-          </ng-template>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>5 · Understanding this person</mat-panel-title>
-          </mat-expansion-panel-header>
-          <ul class="insights">
-            @for (line of insights(); track $index) {
-              <li>{{ line }}</li>
-            } @empty {
-              <li class="muted">Not enough check-ins yet to see patterns.</li>
-            }
-          </ul>
-          <p class="disclaimer">Based on their own check-ins and focus logs. Wellbeing tool, not medical advice.</p>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>6 · Next-week outlook</mat-panel-title>
+            <mat-panel-title>4 · Next-week outlook</mat-panel-title>
             @if (outlook(); as o) {
               <mat-panel-description><span class="risk" [class]="o.level">{{ o.level }} risk</span></mat-panel-description>
             }

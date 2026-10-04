@@ -151,38 +151,6 @@
   margin-bottom: var(--s1);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: var(--s1) 0;
-}
-
-.chip {
-  font-size: 0.78rem;
-  padding: 3px 10px;
-  border-radius: 999px;
-
-  &.strong {
-    background: color-mix(in srgb, var(--status-working) 15%, transparent);
-    color: light-dark(#23744a, #8fd8ab);
-  }
-
-  &.gap {
-    background: color-mix(in srgb, var(--status-blocked) 18%, transparent);
-    color: light-dark(#8a6514, #f0d08a);
-  }
-}
-
-.insights {
-  margin: 0 0 var(--s1);
-  padding-left: 18px;
-  display: grid;
-  gap: 6px;
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
 .risk-line {
   display: flex;
   align-items: center;
