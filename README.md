@@ -21,7 +21,7 @@ Production build: `npm run build` (output in `dist/pulse-dashboard`).
 
 | Route | Page | Who |
 | --- | --- | --- |
-| `/` | Overview: 3D coin hero + org chart, then KPIs and a 6-month trend with Month → Week → Day drill-down | everyone |
+| `/` | Overview: 3D coin hero + org chart, then 3 KPIs (each with a Web vs avg. other team bar) and a 6-month trend with Month → Week → Day drill-down | everyone |
 | `/team` | Person cards (health first, then today's %, then current task) and a side drawer with 4 levels: today, last 7 days, last 4 weeks, next-week outlook | Manager |
 | `/tasks` | Daily signal board: 6 progress rings, task rows with Accept, smart reassignment | everyone (Accept / Approve for Manager) |
 | `/wellbeing` | Team averages only: feeling well %, energy, focus, stress, WHO-5, Maslach bars, flow hours | everyone |

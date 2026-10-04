@@ -24,6 +24,16 @@ import { InfoTip } from '../info-tip/info-tip';
       } @else if (hint()) {
         <div class="delta muted">{{ hint() }}</div>
       }
+      @if (bars(); as b) {
+        <div class="vs" [attr.aria-label]="'Web Team ' + value() + unit() + ', average other team ' + compare() + unit()">
+          <span>Web Team</span>
+          <strong>{{ value() }}{{ unit() }}</strong>
+          <i><b class="web" [style.width.%]="b.web"></b></i>
+          <span>{{ compareName() }}</span>
+          <strong class="muted">{{ compare() }}{{ unit() }}</strong>
+          <i><b [style.width.%]="b.others"></b></i>
+        </div>
+      }
     </div>
   `,
   styles: `
@@ -50,6 +60,22 @@ import { InfoTip } from '../info-tip/info-tip';
     .delta { font-size: 0.8rem; }
     .delta.up { color: var(--pulse-positive); }
     .delta.down { color: var(--pulse-caution); }
+    .vs {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px dashed var(--pulse-border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 4px 10px;
+      font-size: 0.76rem;
+      color: var(--pulse-muted);
+    }
+    .vs i { grid-column: 1 / -1; margin-bottom: 4px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--pulse-muted) 14%, transparent); overflow: hidden; }
+    .vs b { display: block; height: 100%; border-radius: 3px; background: color-mix(in srgb, var(--pulse-muted) 55%, transparent); }
+    .vs b.web { background: var(--pulse-accent); }
+    .vs strong { color: var(--pulse-text); font-weight: 600; text-align: right; }
+    .vs strong.muted { color: var(--pulse-muted); }
   `,
 })
 export class KpiCard {
@@ -65,6 +91,17 @@ export class KpiCard {
   readonly hint = input('');
   readonly info = input<string | null>(null);
   readonly accent = input(false);
+  /** Same figure for the average other team; shows a Web vs others bar pair. */
+  readonly compare = input<number | null>(null);
+  readonly compareName = input('Avg. other team');
+
+  protected readonly bars = computed(() => {
+    const other = this.compare();
+    const web = Number(this.value());
+    if (other === null || Number.isNaN(web)) return null;
+    const max = Math.max(web, other) || 1;
+    return { web: (web / max) * 100, others: (other / max) * 100 };
+  });
 
   protected readonly trend = computed(() => {
     const d = this.delta() ?? 0;

@@ -79,3 +79,10 @@
 .kpis {
   margin-bottom: var(--s3);
 }
+
+// Three KPI cards: one row on desktop and tablet, stacked on phones.
+@media (min-width: 721px) {
+  .grid12.kpis > .c4 {
+    grid-column: span 4;
+  }
+}

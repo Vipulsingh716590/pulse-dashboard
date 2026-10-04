@@ -30,7 +30,7 @@
   @let k = kpis();
   <section class="grid12 kpis">
     <app-kpi-card
-      class="c3"
+      class="c4"
       label="Web Team contribution"
       [value]="k.contribution"
       unit="%"
@@ -39,10 +39,19 @@
       deltaUnit=" pts"
       [deltaLabel]="compareLabel()"
       [info]="'Share of company-wide business impact points. Rank #' + k.rank + ' of ' + k.teamCount + ' teams.'"
+      [compare]="k.othersContribution"
     />
-    <app-kpi-card class="c3" label="Tasks delivered" [value]="k.delivered" [delta]="k.deliveredDelta" [deltaLabel]="compareLabel()" />
-    <app-kpi-card class="c3" label="Delivered on time" [value]="k.onTime" unit="%" [delta]="k.onTimeDelta" deltaUnit=" pts" [deltaLabel]="compareLabel()" />
-    <app-kpi-card class="c3" label="Bugs fixed" [value]="k.bugs" [delta]="k.bugsDelta" [deltaLabel]="compareLabel()" />
+    <app-kpi-card class="c4" label="Tasks delivered" [value]="k.delivered" [delta]="k.deliveredDelta" [deltaLabel]="compareLabel()" [compare]="k.othersDelivered" />
+    <app-kpi-card
+      class="c4"
+      label="Delivered on time"
+      [value]="k.onTime"
+      unit="%"
+      [delta]="k.onTimeDelta"
+      deltaUnit=" pts"
+      [deltaLabel]="compareLabel()"
+      [compare]="k.othersOnTime"
+    />
   </section>
 
   <section class="grid12">

@@ -12,7 +12,8 @@ import { KpiCard } from '../../shared/kpi-card/kpi-card';
 import { PersonDrawer } from '../team/person-drawer/person-drawer';
 import { CoinFlip } from './hero/coin-flip';
 import { OrgChart } from './hero/org-chart';
-import { contributionPct, onTimePct, otherTeams, pctChange, totalsByTeam, webRank } from './team-insights';
+import { TeamId } from '../../core/models';
+import { contributionPct, onTimePct, otherTeams, pctChange, TeamTotals, totalsByTeam, webRank } from './team-insights';
 
 const ACCENT = '#6d5dd3';
 const OTHERS = '#a3a9b8';
@@ -78,6 +79,7 @@ export class Overview {
     const web = totals.get('web');
     const curWeb = cur.get('web');
     const prevWeb = prev.get('web');
+    const others = otherTeams(this.teams()).map((t) => totals.get(t.id));
     return {
       contribution: round(contributionPct(totals), 1),
       contributionDelta: hasPrev ? contributionPct(cur) - contributionPct(prev) : null,
@@ -88,8 +90,10 @@ export class Overview {
       deliveredDelta: hasPrev ? pctChange(perDay(curWeb?.tasksDelivered, this.days(this.drill.current())), perDay(prevWeb?.tasksDelivered, this.days(this.drill.previous()))) : null,
       onTime: round(onTimePct(web), 1),
       onTimeDelta: hasPrev ? onTimePct(curWeb) - onTimePct(prevWeb) : null,
-      bugs: web?.bugsFixed ?? 0,
-      bugsDelta: hasPrev ? pctChange(perDay(curWeb?.bugsFixed, this.days(this.drill.current())), perDay(prevWeb?.bugsFixed, this.days(this.drill.previous()))) : null,
+      // Same numbers for the average other team, shown under each card.
+      othersContribution: round(average(others.map((o) => share(totals, o))), 1),
+      othersDelivered: round(average(others.map((o) => o?.tasksDelivered ?? 0)), 1),
+      othersOnTime: round(average(others.map((o) => onTimePct(o))), 1),
     };
   });
 
@@ -152,3 +156,9 @@ export class Overview {
 }
 
 const perDay = (value: number | undefined, days: number) => (days ? (value ?? 0) / days : 0);
+
+/** One team's share of company-wide impact, 0–100. */
+function share(totals: Map<TeamId, TeamTotals>, t: TeamTotals | undefined): number {
+  const all = [...totals.values()].reduce((s, x) => s + x.impactScore, 0);
+  return all ? ((t?.impactScore ?? 0) / all) * 100 : 0;
+}
