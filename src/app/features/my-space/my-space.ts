@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { SKILL_LABELS, SkillArea, Task } from '../../core/models';
+import { Task } from '../../core/models';
 import { NotificationService } from '../../core/services/notification.service';
 import { TeamStore } from '../../core/services/team-store.service';
 import { ViewingAsService } from '../../core/services/viewing-as.service';
 import { formatDay, fToC, formatLongDate, MOCK_TODAY, mockNow, weekStart } from '../../core/utils/date';
-import { FRAMEWORK_TIPS, IMPROVEMENT_ACTIONS, isUnwell, STATUS_LABELS, strengthsAndGaps, TYPE_LABELS } from '../../core/utils/insights';
+import { FRAMEWORK_TIPS, isUnwell, STATUS_LABELS, TYPE_LABELS } from '../../core/utils/insights';
 import { SevenDayTable } from '../../shared/charts/seven-day-table';
 import { SimpleTrend } from '../../shared/charts/simple-trend';
-import { SkillRadar } from '../../shared/charts/skill-radar';
 import { InfoTip } from '../../shared/info-tip/info-tip';
 import { StatusDot } from '../../shared/status-dot/status-dot';
 import { CheckInForm } from './check-in-form';
@@ -17,7 +16,7 @@ import { HealthDataPanel } from './health-data/health-data-panel';
 /** A developer's own space: check-in, tasks, history, growth, reflection and outlook. */
 @Component({
   selector: 'app-my-space',
-  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, SkillRadar, InfoTip, SimpleTrend, HealthDataPanel],
+  imports: [MatButtonModule, CheckInForm, StatusDot, SevenDayTable, InfoTip, SimpleTrend, HealthDataPanel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './my-space.html',
   styleUrl: './my-space.scss',
@@ -48,17 +47,6 @@ export class MySpace {
   protected readonly tasks = computed(() => this.store.tasksToday(this.viewingAs.viewerId()));
   protected readonly load = computed(() => this.store.loadOf(this.viewingAs.viewerId()));
   protected readonly outlook = computed(() => this.store.outlooks().get(this.viewingAs.viewerId()));
-
-  /** One small action for each weak area (≤ 2/5); if none, for the lowest area below 4. */
-  protected readonly growth = computed(() => {
-    const me = this.me();
-    if (!me) return [];
-    const { gaps } = strengthsAndGaps(me);
-    const areas = gaps.length
-      ? gaps
-      : (Object.entries(me.skills) as [SkillArea, number][]).filter(([, v]) => v < 4).sort((a, b) => a[1] - b[1]).slice(0, 1).map(([area, score]) => ({ area, score }));
-    return areas.map((g) => ({ ...g, label: SKILL_LABELS[g.area], action: IMPROVEMENT_ACTIONS[g.area] }));
-  });
 
   // ---- weekly Stoic reflection ----
   private readonly thisWeek = weekStart(MOCK_TODAY);

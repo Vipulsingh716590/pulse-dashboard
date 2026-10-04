@@ -133,32 +133,6 @@
   }
 }
 
-.sub {
-  font-size: 0.9rem;
-  margin: var(--s1) 0;
-}
-
-.growth {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--s1);
-
-  li {
-    display: grid;
-    gap: 2px;
-    padding: 12px;
-    border-radius: 12px;
-    background: var(--pulse-surface-2);
-    font-size: 0.88rem;
-  }
-
-  span {
-    color: var(--pulse-muted);
-  }
-}
-
 .reflect {
   display: grid;
   gap: 12px;

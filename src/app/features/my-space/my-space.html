@@ -112,25 +112,9 @@
         </ul>
       </div>
 
-      <div class="card c7">
+      <div class="card c12">
         <div class="card-head"><h2>My last 7 days</h2></div>
         <app-seven-day-table [personId]="p.id" [ownView]="true" />
-      </div>
-
-      <div class="card c5">
-        <div class="card-head"><h2>My skills</h2></div>
-        <app-skill-radar [skills]="p.skills" [height]="240" />
-        <h3 class="sub">One small step</h3>
-        <ul class="growth">
-          @for (g of growth(); track g.area) {
-            <li>
-              <strong>{{ g.label }} · {{ g.score }}/5</strong>
-              <span>{{ g.action }}</span>
-            </li>
-          } @empty {
-            <li class="muted">Every area is at 4/5 or above. Consider mentoring someone this week.</li>
-          }
-        </ul>
       </div>
 
       <div class="card c6">
